@@ -1,0 +1,22 @@
+{
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    "tasks": [
+        {
+            "label": "Run in network mode",
+            "type": "shell",
+            "command": "python main.py net",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run current file",
+            "type": "shell",
+            "command": "python ${file}",
+            "group": "build"
+        }
+    ]
+}
