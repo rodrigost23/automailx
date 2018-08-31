@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-
 import os
 import socket
 import subprocess
 import sys
-import time
 from struct import *
 
 import pygame
@@ -14,9 +12,8 @@ from OpenGL.GLU import *
 from pygame.locals import *
 
 mode = "serial"
-accel = tuple([0, 0, 0])
-vel = tuple([0, 0, 0])
-pos = tuple([0, 0.0, -7.0])
+accel = tuple()
+pos = tuple()
 yaw_offset = 0
 ax = ay = az = 0.0
 yaw_mode = False
@@ -59,7 +56,7 @@ def draw():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glLoadIdentity()
-    glTranslatef(*pos)
+    glTranslatef(0, 0.0, -7.0)
 
     osd_text = "pitch: " + str("{0:.2f}".format(ay)) + \
         ", roll: " + str("{0:.2f}".format(ax))
@@ -120,44 +117,44 @@ def draw():
 
 
 def read_data_socket(sock):
-    global ax, ay, az, yaw_offset, accel, vel, pos
+    global ax, ay, az, yaw_offset, accel
     # ax = ay = az = 0.0
 
     try:
         data, _ = sock.recvfrom(1024)  # buffer size is 1024 bytes
-        # print("received message: ", "%1.4f"
-        #       % unpack_from('!f', data, 0), "%1.4f"
-        #       % unpack_from('!f', data, 4), "%1.4f"
-        #       % unpack_from('!f', data, 8), "%1.4f"
+        print("received message: ", "%1.4f"
+              % unpack_from('!f', data, 0), "%1.4f"
+              % unpack_from('!f', data, 4), "%1.4f"
+              % unpack_from('!f', data, 8), "%1.4f"
 
-        #       % unpack_from('!f', data, 12), "%1.4f"
-        #       % unpack_from('!f', data, 16), "%1.4f"
-        #       % unpack_from('!f', data, 20), "%1.4f"
+              % unpack_from('!f', data, 12), "%1.4f"
+              % unpack_from('!f', data, 16), "%1.4f"
+              % unpack_from('!f', data, 20), "%1.4f"
 
-        #       % unpack_from('!f', data, 24), "%1.4f"
-        #       % unpack_from('!f', data, 28), "%1.4f"
-        #       % unpack_from('!f', data, 32), "%1.4f"
+              % unpack_from('!f', data, 24), "%1.4f"
+              % unpack_from('!f', data, 28), "%1.4f"
+              % unpack_from('!f', data, 32), "%1.4f"
 
-        #       % unpack_from('!f', data, 36), "%1.4f"
-        #       % unpack_from('!f', data, 40), "%1.4f"
-        #       % unpack_from('!f', data, 44), "%1.4f"
+              % unpack_from('!f', data, 36), "%1.4f"
+              % unpack_from('!f', data, 40), "%1.4f"
+              % unpack_from('!f', data, 44), "%1.4f"
 
-        #       % unpack_from('!f', data, 48), "%1.4f"
-        #       % unpack_from('!f', data, 52), "%1.4f"
-        #       % unpack_from('!f', data, 56), "%1.4f"
-        #       % unpack_from('!f', data, 60), "%1.4f"
-        #       % unpack_from('!f', data, 64), "%1.4f"
-        #       % unpack_from('!f', data, 68), "%1.4f"
-        #       % unpack_from('!f', data, 72), "%1.4f"
-        #       % unpack_from('!f', data, 76), "%1.4f"
-        #       % unpack_from('!f', data, 80), "%1.4f"
-        #       % unpack_from('!f', data, 84), "%1.4f"
-        #       % unpack_from('!f', data, 88), "%1.4f"
-        #       % unpack_from('!f', data, 92))
+              % unpack_from('!f', data, 48), "%1.4f"
+              % unpack_from('!f', data, 52), "%1.4f"
+              % unpack_from('!f', data, 56), "%1.4f"
+              % unpack_from('!f', data, 60), "%1.4f"
+              % unpack_from('!f', data, 64), "%1.4f"
+              % unpack_from('!f', data, 68), "%1.4f"
+              % unpack_from('!f', data, 72), "%1.4f"
+              % unpack_from('!f', data, 76), "%1.4f"
+              % unpack_from('!f', data, 80), "%1.4f"
+              % unpack_from('!f', data, 84), "%1.4f"
+              % unpack_from('!f', data, 88), "%1.4f"
+              % unpack_from('!f', data, 92))
 
-        accel = (unpack_from('!f', data, 0)[0],
-                 unpack_from('!f', data, 4)[0],
-                 unpack_from('!f', data, 8)[0])
+        accel = (unpack_from('!f', data, 0),
+                 unpack_from('!f', data, 4),
+                 unpack_from('!f', data, 8))
 
         # angles = [float(x) for x in line.split(b',')]
         angles = (unpack_from('!f', data, 36)[0],
@@ -169,12 +166,12 @@ def read_data_socket(sock):
             if yaw_offset == 0:
                 yaw_offset = float(angles[0])
 
-            # print("angles", angles)
+            print("angles", angles)
             ax = -float(angles[2])
             ay = -float(angles[1])
             az = float(angles[0])
     except Exception as e:
-        print(e)
+        pass
 
 
 def read_data_serial(ser):
@@ -206,14 +203,13 @@ def main():
     if mode == "net":
         #UDP_IP = "96.49.100.238"
         #UDP_IP = "127.0.0.1"
-        UDP_IP = socket.gethostbyname(socket.gethostname())
-        print("Receiver IP: ", UDP_IP)
+        print("Receiver IP: ", socket.gethostbyname(socket.gethostname()))
         UDP_PORT = 5000
         # UDP_PORT = int(raw_input ("Enter Port "))
         print("Port: ", UDP_PORT)
         sock = socket.socket(socket.AF_INET,  # Internet
                              socket.SOCK_DGRAM)  # UDP
-        sock.bind((UDP_IP, UDP_PORT))
+        sock.bind(("0.0.0.0", UDP_PORT))
     else:
         ser = serial.Serial('/dev/tty.usbserial', 38400, timeout=1)
 
