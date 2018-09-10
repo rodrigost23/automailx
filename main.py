@@ -16,7 +16,7 @@ accel = tuple()
 pos = tuple()
 yaw_offset = 0
 ax = ay = az = 0.0
-yaw_mode = False
+yaw_mode = True
 
 
 def resize2(width_height):
