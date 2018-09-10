@@ -7,10 +7,13 @@
             "label": "Run in network mode",
             "type": "shell",
             "command": "python main.py net",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "group": "build"
+        },
+        {
+            "label": "Run in serial mode",
+            "type": "shell",
+            "command": "python main.py serial",
+            "group": "build"
         },
         {
             "label": "Run current file",

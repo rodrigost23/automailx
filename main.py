@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import socket
 import subprocess
 import sys
 from struct import *
@@ -11,7 +10,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from pygame.locals import *
 
-mode = "serial"
+from sensors import Sensors
+
 accel = tuple()
 pos = tuple()
 yaw_offset = 0
@@ -115,103 +115,9 @@ def draw():
     glVertex3f(1.0, -0.2, -1.0)
     glEnd()
 
-
-def read_data_socket(sock):
-    global ax, ay, az, yaw_offset, accel
-    # ax = ay = az = 0.0
-
-    try:
-        data, _ = sock.recvfrom(1024)  # buffer size is 1024 bytes
-        print("received message: ", "%1.4f"
-              % unpack_from('!f', data, 0), "%1.4f"
-              % unpack_from('!f', data, 4), "%1.4f"
-              % unpack_from('!f', data, 8), "%1.4f"
-
-              % unpack_from('!f', data, 12), "%1.4f"
-              % unpack_from('!f', data, 16), "%1.4f"
-              % unpack_from('!f', data, 20), "%1.4f"
-
-              % unpack_from('!f', data, 24), "%1.4f"
-              % unpack_from('!f', data, 28), "%1.4f"
-              % unpack_from('!f', data, 32), "%1.4f"
-
-              % unpack_from('!f', data, 36), "%1.4f"
-              % unpack_from('!f', data, 40), "%1.4f"
-              % unpack_from('!f', data, 44), "%1.4f"
-
-              % unpack_from('!f', data, 48), "%1.4f"
-              % unpack_from('!f', data, 52), "%1.4f"
-              % unpack_from('!f', data, 56), "%1.4f"
-              % unpack_from('!f', data, 60), "%1.4f"
-              % unpack_from('!f', data, 64), "%1.4f"
-              % unpack_from('!f', data, 68), "%1.4f"
-              % unpack_from('!f', data, 72), "%1.4f"
-              % unpack_from('!f', data, 76), "%1.4f"
-              % unpack_from('!f', data, 80), "%1.4f"
-              % unpack_from('!f', data, 84), "%1.4f"
-              % unpack_from('!f', data, 88), "%1.4f"
-              % unpack_from('!f', data, 92))
-
-        accel = (unpack_from('!f', data, 0),
-                 unpack_from('!f', data, 4),
-                 unpack_from('!f', data, 8))
-
-        # angles = [float(x) for x in line.split(b',')]
-        angles = (unpack_from('!f', data, 36)[0],
-                  unpack_from('!f', data, 40)[0],
-                  unpack_from('!f', data, 44)[0])
-
-        if len(angles) == 3:
-
-            if yaw_offset == 0:
-                yaw_offset = float(angles[0])
-
-            print("angles", angles)
-            ax = -float(angles[2])
-            ay = -float(angles[1])
-            az = float(angles[0])
-    except Exception as e:
-        pass
-
-
-def read_data_serial(ser):
-    global ax, ay, az
-    ax = ay = az = 0.0
-    line_done = 0
-
-    # request data by sending a dot
-    ser.write(".")
-    # while not line_done:
-    line = ser.readline()
-    angles = line.split(", ")
-    if len(angles) == 3:
-        ax = float(angles[0])
-        ay = float(angles[1])
-        az = float(angles[2])
-        line_done = 1
-
-
-def main():
-    global yaw_mode, mode
-
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "net":
-            mode = "net"
-        elif sys.argv[1] == "serial":
-            mode = "serial"
-
-    if mode == "net":
-        #UDP_IP = "96.49.100.238"
-        #UDP_IP = "127.0.0.1"
-        print("Receiver IP: ", socket.gethostbyname(socket.gethostname()))
-        UDP_PORT = 5000
-        # UDP_PORT = int(raw_input ("Enter Port "))
-        print("Port: ", UDP_PORT)
-        sock = socket.socket(socket.AF_INET,  # Internet
-                             socket.SOCK_DGRAM)  # UDP
-        sock.bind(("0.0.0.0", UDP_PORT))
-    else:
-        ser = serial.Serial('/dev/tty.usbserial', 38400, timeout=1)
+def main(mode):
+    global yaw_mode, ax, ay, az
+    sensors = Sensors(mode)
 
     video_flags = OPENGL | DOUBLEBUF
 
@@ -229,18 +135,18 @@ def main():
         if event.type == KEYDOWN and event.key == K_z:
             yaw_mode = not yaw_mode
             # ser.write("z")
-        if mode == "net":
-            read_data_socket(sock)
-        else:
-            read_data_serial(ser)
+        angles = sensors.read()
+        if angles != None:
+            ax, ay, az = angles
         draw()
+        print(ax,ay,az)
 
         pygame.display.flip()
         frames = frames+1
 
     print("fps:  %d" % ((frames*1000)/(pygame.time.get_ticks()-ticks)))
-    file.close()
+    sensors.close()
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else "serial")
