@@ -25,7 +25,6 @@ class Sensors():
             self.sock.bind(("0.0.0.0", UDP_PORT))
         else:
             self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-            self.ser.flush()
 
     def read(self):
         if self.mode == "net":
@@ -105,12 +104,15 @@ class Sensors():
             __interval = millis
 
         # while not line_done:
+        self.ser.flush()
+        self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer()
         line = self.ser.readline()
 
         if line[:3] == b'ypr' and line[-2:] == b'\r\n':
             angles = line.split(b'\t')[1:-2]
 
-        elif line[0:2] == b'$\x02' and line[-2:] == b'\r\n':
+        elif len(line) > 9 and line[0:2] == b'$\x02' and line[-2:] == b'\r\n':
             q = [0.0]*4
             q[0] = ((line[2] << 8) | line[3]) / 16384.0
             q[1] = ((line[4] << 8) | line[5]) / 16384.0
