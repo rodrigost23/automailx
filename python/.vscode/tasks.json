@@ -7,19 +7,22 @@
             "label": "Run in network mode",
             "type": "shell",
             "command": "python main.py net",
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
         },
         {
             "label": "Run in serial mode",
             "type": "shell",
             "command": "python main.py serial",
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
         },
         {
             "label": "Run current file",
             "type": "shell",
             "command": "python ${file}",
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }
