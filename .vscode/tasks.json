@@ -2,16 +2,10 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run Sketch",
+            "label": "AutomailX-Processing: Run Sketch",
             "type": "shell",
             "group": "build",
             "command": "${config:processing.path}",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "dedicated"
-            },
             "args": [
                 "--force",
                 "--sketch=${workspaceRoot}",
@@ -25,7 +19,29 @@
                     "--output=${workspaceRoot}\\out",
                     "--run"
                 ]
-            }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "AutomailX-Python: Network mode",
+            "type": "shell",
+            "command": "python automailx.py net",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "AutomailX-Python: Serial mode",
+            "type": "shell",
+            "command": "python automailx.py serial",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Python: Current file",
+            "type": "shell",
+            "command": "python ${file}",
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }
