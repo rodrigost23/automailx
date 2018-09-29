@@ -33,12 +33,17 @@ def resize2(width_height):
 
 
 def init():
+    global quad
     glShadeModel(GL_SMOOTH)
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClearDepth(1.0)
     glEnable(GL_DEPTH_TEST)
     glDepthFunc(GL_LEQUAL)
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+
+    quad = gluNewQuadric()
+    gluQuadricDrawStyle(quad, GL_LINE)
+    gluQuadricTexture(quad, GL_TRUE)
 
 
 def drawText(position, textString):
@@ -52,7 +57,7 @@ def drawText(position, textString):
 
 
 def draw(fps: int):
-    global rquad
+    global quad
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glLoadIdentity()
@@ -65,49 +70,29 @@ def draw(fps: int):
     drawText((-2, -2, 2), osd_line)
     # drawText((2.45, 1.9, 2), "FPS: %d" % fps)
 
-    # the way I'm holding the IMU board, X and Y axis are switched
-    # with respect to the OpenGL coordinate system
+    glTranslatef(0, 2.0, 0.0)
     glRotatef(az, 0.0, 1.0, 0.0)  # Yaw,   rotate around y-axis
     glRotatef(ay, 1.0, 0.0, 0.0)  # Pitch, rotate around x-axis
     glRotatef(ax, 0.0, 0.0, 1.0)  # Roll,  rotate around z-axis
 
-    glBegin(GL_QUADS)
-    glColor3f(0.0, 1.0, 0.0)
-    glVertex3f(1.0, 0.2, -1.0)
-    glVertex3f(-1.0, 0.2, -1.0)
-    glVertex3f(-1.0, 0.2, 1.0)
-    glVertex3f(1.0, 0.2, 1.0)
+    glColor3f(1, 0, 1)
+    gluDisk(quad, 0, 0.2, 10, 1)
 
-    glColor3f(1.0, 0.5, 0.0)
-    glVertex3f(1.0, -0.2, 1.0)
-    glVertex3f(-1.0, -0.2, 1.0)
-    glVertex3f(-1.0, -0.2, -1.0)
-    glVertex3f(1.0, -0.2, -1.0)
+    glColor3f(0, 0, 1)
+    gluCylinder(quad, 0.2, 0.15, 2, 10, 1)
 
-    glColor3f(1.0, 0.0, 0.0)
-    glVertex3f(1.0, 0.2, 1.0)
-    glVertex3f(-1.0, 0.2, 1.0)
-    glVertex3f(-1.0, -0.2, 1.0)
-    glVertex3f(1.0, -0.2, 1.0)
+    glTranslatef(0, 0, 2)
 
-    glColor3f(1.0, 1.0, 0.0)
-    glVertex3f(1.0, -0.2, -1.0)
-    glVertex3f(-1.0, -0.2, -1.0)
-    glVertex3f(-1.0, 0.2, -1.0)
-    glVertex3f(1.0, 0.2, -1.0)
+    glColor3f(0, 1, 0)
+    gluDisk(quad, 0, 0.15, 10, 1)
+    gluSphere(quad, 0.2, 6, 6)
 
-    glColor3f(0.0, 0.0, 1.0)
-    glVertex3f(-1.0, 0.2, 1.0)
-    glVertex3f(-1.0, 0.2, -1.0)
-    glVertex3f(-1.0, -0.2, -1.0)
-    glVertex3f(-1.0, -0.2, 1.0)
+    glColor3f(0.2, 0.4, 1)
+    gluCylinder(quad, 0.15, 0.125, 1.8, 9, 1)
 
-    glColor3f(1.0, 0.0, 1.0)
-    glVertex3f(1.0, 0.2, -1.0)
-    glVertex3f(1.0, 0.2, 1.0)
-    glVertex3f(1.0, -0.2, 1.0)
-    glVertex3f(1.0, -0.2, -1.0)
-    glEnd()
+    glTranslatef(0, 0, 1.8)
+    glColor3f(0, 1, 0)
+    gluDisk(quad, 0, 0.125, 9, 1)
 
 
 def main(mode):
