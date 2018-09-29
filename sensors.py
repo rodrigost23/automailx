@@ -32,8 +32,7 @@ class Sensors():
         else:
             return self.__readserial()
 
-    def __readsocket(self):
-        global yaw_offset, accel
+    def __readsocket(self, yaw_offset=0):
         # ax = ay = az = 0.0
 
         try:
