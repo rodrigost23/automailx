@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import argparse
 import os
 import subprocess
 import sys
@@ -95,9 +96,9 @@ def draw(fps: int):
     gluDisk(quad, 0, 0.125, 9, 1)
 
 
-def main(mode):
+def main(**kwargs):
     global ax, ay, az
-    sensors = Sensors(mode)
+    sensors = Sensors(**kwargs)
 
     video_flags = OPENGL | DOUBLEBUF
 
@@ -138,4 +139,14 @@ def main(mode):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1] if len(sys.argv) > 1 else "serial")
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--net', metavar='port', const=5000, default=None,
+                       type=int, nargs='?', help='Listen to sensor data over UDP')
+    group.add_argument('--serial', metavar='port', const='/dev/ttyACM0', default=None,
+                       nargs='?', help='Listen to sensor data over serial (default)')
+    args = parser.parse_args()
+    if not args.net and not args.serial:
+        args = parser.parse_args(['--serial'])
+
+    main(net=args.net, serial=args.serial)

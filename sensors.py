@@ -13,18 +13,18 @@ class Sensors():
     sock = None
     ser = None
 
-    def __init__(self, mode):
-        self.mode = mode
+    def __init__(self, **kwargs):
+        self.mode = "net" if kwargs['net'] else "serial"
         if self.mode == "net":
             print("Receiver IP: ", socket.gethostbyname(socket.gethostname()))
-            UDP_PORT = 5000
+            UDP_PORT = kwargs['net']
             # UDP_PORT = int(raw_input ("Enter Port "))
             print("Port: ", UDP_PORT)
             self.sock = socket.socket(socket.AF_INET,  # Internet
                                       socket.SOCK_DGRAM)  # UDP
             self.sock.bind(("0.0.0.0", UDP_PORT))
         else:
-            self.ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+            self.ser = serial.Serial(kwargs['serial'], 115200, timeout=1)
 
     def read(self):
         if self.mode == "net":
