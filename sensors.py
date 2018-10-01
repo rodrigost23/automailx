@@ -17,12 +17,12 @@ class Sensors():
         self.mode = "net" if kwargs['net'] else "serial"
         if self.mode == "net":
             print("Receiver IP: ", socket.gethostbyname(socket.gethostname()))
-            UDP_PORT = kwargs['net']
+            udp_port = kwargs['net']
             # UDP_PORT = int(raw_input ("Enter Port "))
-            print("Port: ", UDP_PORT)
+            print("Port: ", udp_port)
             self.sock = socket.socket(socket.AF_INET,  # Internet
                                       socket.SOCK_DGRAM)  # UDP
-            self.sock.bind(("0.0.0.0", UDP_PORT))
+            self.sock.bind(("0.0.0.0", udp_port))
         else:
             self.ser = serial.Serial(kwargs['serial'], 115200, timeout=1)
 
@@ -86,7 +86,7 @@ class Sensors():
                 ay = -float(angles[1])
                 az = float(angles[0])
 
-                return (ax, ay, az)
+                return {'x': ax, 'y': ay, 'z': az}
         except Exception as e:
             pass
 
@@ -130,25 +130,25 @@ class Sensors():
             ax = float(angles[0])
             ay = float(angles[1])
             az = float(angles[2])
-            print(ax, ay, az)
-            return (ax, ay, az)
+            print({'x': ax, 'y': ay, 'z': az})
+            return {'x': ax, 'y': ay, 'z': az}
 
     def close(self):
         # self.file.close()
         pass
 
     def quaternion_to_euler_angle(self, w, x, y, z):
-        t0 = +2.0 * (w * x + y * z)
-        t1 = +1.0 - 2.0 * (x * x + y * y)
-        X = math.degrees(math.atan2(t0, t1))
+        t_0 = +2.0 * (w * x + y * z)
+        t_1 = +1.0 - 2.0 * (x * x + y * y)
+        x = math.degrees(math.atan2(t_0, t_1))
 
-        t2 = +2.0 * (w * y - z * x)
-        t2 = +1.0 if t2 > +1.0 else t2
-        t2 = -1.0 if t2 < -1.0 else t2
-        Y = math.degrees(math.asin(t2))
+        t_2 = +2.0 * (w * y - z * x)
+        t_2 = +1.0 if t_2 > +1.0 else t_2
+        t_2 = -1.0 if t_2 < -1.0 else t_2
+        y = math.degrees(math.asin(t_2))
 
-        t3 = +2.0 * (w * z + x * y)
-        t4 = +1.0 - 2.0 * (y * y + z * z)
-        Z = math.degrees(math.atan2(t3, t4))
+        t_3 = +2.0 * (w * z + x * y)
+        t_4 = +1.0 - 2.0 * (y * y + z * z)
+        z = math.degrees(math.atan2(t_3, t_4))
 
-        return (X, Y, Z)
+        return (x, y, z)
