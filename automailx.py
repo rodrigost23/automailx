@@ -15,7 +15,7 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--net', metavar='port', const=5000, default=None,
                        type=int, nargs='?', help='Listen to sensor data over UDP')
-    group.add_argument('--serial', metavar='port', const='/dev/ttyACM0', default=None,
+    group.add_argument('--serial', metavar='port', const=True, default=None,
                        nargs='?', help='Listen to sensor data over serial (default)')
     args = parser.parse_args()
     if not args.net and not args.serial:

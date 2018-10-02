@@ -4,6 +4,8 @@ import time
 from struct import unpack_from
 
 import serial
+from serial import tools
+from serial.tools import list_ports
 
 
 class Sensors():
@@ -24,7 +26,25 @@ class Sensors():
                                       socket.SOCK_DGRAM)  # UDP
             self.sock.bind(("0.0.0.0", udp_port))
         else:
-            self.ser = serial.Serial(kwargs['serial'], 115200, timeout=1)
+            port = kwargs['serial']
+            serial.tools.list_ports.grep
+
+            try:
+                search = serial.tools.list_ports.grep(port)
+                next(search)
+            except Exception:
+                port_list = serial.tools.list_ports.comports()
+                for p in port_list:
+                    if 'arduino' in p.description.lower():
+                        port = p.device
+                        break
+                else:
+                    raise Exception("No Arduino found. Please specify the serial port by using the --serial argument.")
+
+            baud_rate = 115200
+            print("Serial port:", port)
+            print("Baud rate:", baud_rate)
+            self.ser = serial.Serial(port, baud_rate, timeout=1)
 
     def read(self):
         if self.mode == "net":
@@ -123,14 +143,12 @@ class Sensors():
                     q[i] = -4 + q[i]
             # TODO: Use quaternion directly
             angles = self.quaternion_to_euler_angle(*q)
-        elif len(line) >= 4:
-            print(line)
 
         if len(angles) == 3:
             ax = float(angles[0])
             ay = float(angles[1])
             az = float(angles[2])
-            print({'x': ax, 'y': ay, 'z': az})
+            # print({'x': ax, 'y': ay, 'z': az})
             return {'x': ax, 'y': ay, 'z': az}
 
     def close(self):

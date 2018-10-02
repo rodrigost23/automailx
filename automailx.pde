@@ -70,13 +70,16 @@ void setup() {
     hs = new HScrollbar(0, height-8, width, 16, 1);
   
     // display serial port list for debugging/clarity
-    println(Serial.list());
+    String[] serialList = Serial.list();
+    println(serialList);
 
     // get the first available port (use EITHER this OR the specific port code below)
-    String portName = "/dev/ttyACM0";
+    // String portName = "/dev/ttyACM0";
     
     // get a specific serial port (use EITHER this OR the first-available code above)
-    //String portName = "COM4";
+    // String portName = "COM3";
+
+    String portName = serialList[serialList.length - 1];
     
     // open the serial port
     port = new Serial(this, portName, 115200);

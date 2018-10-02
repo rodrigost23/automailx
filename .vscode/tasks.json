@@ -25,14 +25,20 @@
         {
             "label": "AutomailX-Python: Network mode",
             "type": "shell",
-            "command": "python automailx.py --net",
+            "command": "python automailx.py",
+            "args": [
+                "--net"
+            ],
             "group": "build",
             "problemMatcher": []
         },
         {
             "label": "AutomailX-Python: Serial mode",
             "type": "shell",
-            "command": "python automailx.py --serial",
+            "command": "python automailx.py",
+            "args": [
+                "--serial"
+            ],
             "group": "build",
             "problemMatcher": []
         },
