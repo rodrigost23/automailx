@@ -39,7 +39,7 @@ class Sensors():
                         port = p.device
                         break
                 else:
-                    raise Exception("No Arduino found. Please specify the serial port by using the --serial argument.")
+                    port = port_list[-1].device
 
             baud_rate = 115200
             print("Serial port:", port)
