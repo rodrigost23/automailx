@@ -158,15 +158,15 @@ class Sensors():
     def quaternion_to_euler_angle(self, w, x, y, z):
         t_0 = +2.0 * (w * x + y * z)
         t_1 = +1.0 - 2.0 * (x * x + y * y)
-        x = math.degrees(math.atan2(t_0, t_1))
+        a_x = math.degrees(math.atan2(t_0, t_1))
 
         t_2 = +2.0 * (w * y - z * x)
         t_2 = +1.0 if t_2 > +1.0 else t_2
         t_2 = -1.0 if t_2 < -1.0 else t_2
-        y = math.degrees(math.asin(t_2))
+        a_y = math.degrees(math.asin(t_2))
 
         t_3 = +2.0 * (w * z + x * y)
         t_4 = +1.0 - 2.0 * (y * y + z * z)
-        z = math.degrees(math.atan2(t_3, t_4))
+        a_z = math.degrees(math.atan2(t_3, t_4))
 
-        return (x, y, z)
+        return (a_x, a_y, a_z)
