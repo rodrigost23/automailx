@@ -86,11 +86,11 @@ class Simulation():
         gluDisk(self.quad, 0, 0.15, 10, 1)
         gluSphere(self.quad, 0.2, 6, 6)
 
-        glBegin(GL_QUADS)
-
         # First part of foot
 
-        glColor3f(1.0, 1.0, 0.0) # Yellow
+        glBegin(GL_QUADS)
+
+        glColor3f(1.0, 1.0, 0.0)  # Yellow
         glVertex3f(-0.2, -0.1, 0.0)
         glVertex3f(0.2, -0.1, 0.0)
         glVertex3f(0.2, -0.1, 0.3)
@@ -125,5 +125,51 @@ class Simulation():
         glVertex3f(-0.2, 0.8, 0.1)
         glVertex3f(0.2, 0.8, 0.1)
         glVertex3f(0.2, 0.8, 0.3)
-        
+
+        glEnd()
+        glTranslatef(0, 0.8, 0.1)
+
+        glColor3f(0, 1, 0)
+        gluSphere(self.quad, 0.1, 6, 6)
+
+        # Second part of foot
+
+        glBegin(GL_QUADS)
+
+        glColor3f(1.0, 1.0, 0.0)  # Yellow
+        glVertex3f(-0.2, 0.02, 0.0)
+        glVertex3f(0.2, 0.02, 0.0)
+        glVertex3f(0.2, 0.02, 0.2)
+        glVertex3f(-0.2, 0.02, 0.2)
+
+        glColor3f(1.0, 0.5, 0.0)  # Orange
+        glVertex3f(-0.2, 0.02, 0.2)
+        glVertex3f(-0.2, 0.4, 0.2)
+        glVertex3f(-0.2, 0.4, 0.1)
+        glVertex3f(-0.2, 0.02, 0.0)
+
+        glColor3f(1.0, 0.5, 0.0)  # Orange
+        glVertex3f(0.2, 0.02, 0.2)
+        glVertex3f(0.2, 0.4, 0.2)
+        glVertex3f(0.2, 0.4, 0.1)
+        glVertex3f(0.2, 0.02, 0.0)
+
+        glColor3f(1.0, 0.0, 1.0)  # Magenta
+        glVertex3f(-0.2, 0.02, 0.0)
+        glVertex3f(-0.2, 0.4, 0.1)
+        glVertex3f(0.2, 0.4, 0.1)
+        glVertex3f(0.2, 0.02, 0.0)
+
+        glColor3f(0.0, 0.0, 1.0)  # Blue
+        glVertex3f(-0.2, 0.02, 0.2)
+        glVertex3f(-0.2, 0.4, 0.2)
+        glVertex3f(0.2, 0.4, 0.2)
+        glVertex3f(0.2, 0.02, 0.2)
+
+        glColor3f(1.0, 0.0, 0.0)  # Red
+        glVertex3f(-0.2, 0.4, 0.2)
+        glVertex3f(-0.2, 0.4, 0.1)
+        glVertex3f(0.2, 0.4, 0.1)
+        glVertex3f(0.2, 0.4, 0.2)
+
         glEnd()
