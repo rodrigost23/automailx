@@ -56,9 +56,12 @@ class Simulation():
         # drawText((2.45, 1.9, 2), "FPS: %d" % fps)
 
         glTranslatef(0, 2.0, 0.0)
-        glRotatef(self.angles['z'], 0.0, 1.0, 0.0)  # Yaw,   rotate around y-axis
-        glRotatef(self.angles['y'], 1.0, 0.0, 0.0)  # Pitch, rotate around x-axis
-        glRotatef(self.angles['x'], 0.0, 0.0, 1.0)  # Roll,  rotate around z-axis
+        # Yaw,   rotate around y-axis
+        glRotatef(self.angles['z'], 0.0, 1.0, 0.0)
+        # Pitch, rotate around x-axis
+        glRotatef(self.angles['y'], 1.0, 0.0, 0.0)
+        # Roll,  rotate around z-axis
+        glRotatef(self.angles['x'], 0.0, 0.0, 1.0)
 
         glColor3f(1, 0, 1)
         gluDisk(self.quad, 0, 0.2, 10, 1)
@@ -78,3 +81,49 @@ class Simulation():
         glTranslatef(0, 0, 1.8)
         glColor3f(0, 1, 0)
         gluDisk(self.quad, 0, 0.125, 9, 1)
+
+        glColor3f(0, 1, 0)
+        gluDisk(self.quad, 0, 0.15, 10, 1)
+        gluSphere(self.quad, 0.2, 6, 6)
+
+        glBegin(GL_QUADS)
+
+        # First part of foot
+
+        glColor3f(1.0, 1.0, 0.0) # Yellow
+        glVertex3f(-0.2, -0.1, 0.0)
+        glVertex3f(0.2, -0.1, 0.0)
+        glVertex3f(0.2, -0.1, 0.3)
+        glVertex3f(-0.2, -0.1, 0.3)
+
+        glColor3f(1.0, 0.5, 0.0)  # Orange
+        glVertex3f(-0.2, -0.1, 0.3)
+        glVertex3f(-0.2, 0.8, 0.3)
+        glVertex3f(-0.2, 0.8, 0.1)
+        glVertex3f(-0.2, -0.1, 0.0)
+
+        glColor3f(1.0, 0.5, 0.0)  # Orange
+        glVertex3f(0.2, -0.1, 0.3)
+        glVertex3f(0.2, 0.8, 0.3)
+        glVertex3f(0.2, 0.8, 0.1)
+        glVertex3f(0.2, -0.1, 0.0)
+
+        glColor3f(1.0, 0.0, 1.0)  # Magenta
+        glVertex3f(-0.2, -0.1, 0.0)
+        glVertex3f(-0.2, 0.8, 0.1)
+        glVertex3f(0.2, 0.8, 0.1)
+        glVertex3f(0.2, -0.1, 0.0)
+
+        glColor3f(0.0, 0.0, 1.0)  # Blue
+        glVertex3f(-0.2, -0.1, 0.3)
+        glVertex3f(-0.2, 0.8, 0.3)
+        glVertex3f(0.2, 0.8, 0.3)
+        glVertex3f(0.2, -0.1, 0.3)
+
+        glColor3f(1.0, 0.0, 0.0)  # Red
+        glVertex3f(-0.2, 0.8, 0.3)
+        glVertex3f(-0.2, 0.8, 0.1)
+        glVertex3f(0.2, 0.8, 0.1)
+        glVertex3f(0.2, 0.8, 0.3)
+        
+        glEnd()
