@@ -45,6 +45,17 @@
             "problemMatcher": []
         },
         {
+            "label": "AutomailX-Python: Demo",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "automailx.py",
+                "--demo"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
             "label": "Python: Current file",
             "type": "shell",
             "command": "python ${file}",
