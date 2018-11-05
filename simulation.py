@@ -9,6 +9,8 @@ class Simulation():
     POS = tuple()
     YAW_OFFSET = 0
     angles = dict(x=0.0, y=0.0, z=0.0)
+    pose = 0
+    __num_poses = 2
 
     def resize(self, width, height):
         if height == 0:
@@ -33,6 +35,16 @@ class Simulation():
         gluQuadricDrawStyle(self.quad, GL_LINE)
         gluQuadricTexture(self.quad, GL_TRUE)
 
+    def nextPose(self):
+        self.setPose((self.pose + 1) % self.__num_poses)
+
+    def prevPose(self):
+        self.setPose((self.pose - 1) % self.__num_poses)
+
+    def setPose(self, pose):
+        print("set pose %d" % pose)
+        self.pose = pose
+
     def drawText(self, position, textString):
         font = pygame.font.SysFont("Courier", 18, True)
         text_surface = font.render(
@@ -52,7 +64,7 @@ class Simulation():
             ", roll: " + str("{0:.2f}".format(self.angles['x'])) + \
             ", yaw: " + str("{0:.2f}".format(self.angles['z']))
 
-        self.drawText((-2, -2, 2), osd_line)
+        self.drawText((-2, 1.9, 2), osd_line)
         # drawText((2.45, 1.9, 2), "FPS: %d" % fps)
 
         glTranslatef(0, 2.0, 0.0)
@@ -82,11 +94,16 @@ class Simulation():
         glColor3f(0, 1, 0)
         gluDisk(self.quad, 0, 0.125, 9, 1)
 
+        # First part of foot
+
+        if self.pose == 0:
+            pass
+        elif self.pose == 1:
+            glRotatef(60.0, 1.0, 0.0, 0.0)
+
         glColor3f(0, 1, 0)
         gluDisk(self.quad, 0, 0.15, 10, 1)
         gluSphere(self.quad, 0.2, 6, 6)
-
-        # First part of foot
 
         glBegin(GL_QUADS)
 
@@ -129,10 +146,15 @@ class Simulation():
         glEnd()
         glTranslatef(0, 0.8, 0.1)
 
+        # Second part of foot
+
+        if self.pose == 0:
+            pass
+        elif self.pose == 1:
+            glRotatef(-60.0, 1.0, 0.0, 0.0)
+
         glColor3f(0, 1, 0)
         gluSphere(self.quad, 0.1, 6, 6)
-
-        # Second part of foot
 
         glBegin(GL_QUADS)
 

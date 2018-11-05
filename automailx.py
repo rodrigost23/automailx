@@ -29,11 +29,11 @@ def main():
     video_flags = OPENGL | DOUBLEBUF | RESIZABLE
 
     pygame.init()
-    pygame.display.set_mode((853, 480), video_flags)
+    pygame.display.set_mode((900, 500), video_flags)
 
     title = "Press Esc to quit"
     pygame.display.set_caption(title)
-    sim = Simulation(853, 480)
+    sim = Simulation(900, 500)
     frames = 0
     fps = 0
     ticks = pygame.time.get_ticks()
@@ -46,6 +46,11 @@ def main():
         elif event.type == VIDEORESIZE:
             pygame.display.set_mode(event.dict['size'], video_flags)
             sim.resize(*event.dict['size'])
+        elif args.demo:
+            if event.type == KEYDOWN and event.key == K_RIGHT:
+                sim.nextPose()
+            elif event.type == KEYDOWN and event.key == K_LEFT:
+                sim.prevPose()
 
         if not args.demo:
             angles = sensors.read()
