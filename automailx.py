@@ -6,7 +6,7 @@ from struct import *
 import pygame
 from pygame.locals import *
 
-from sensors import Sensors
+from sensors import SensorData, Sensors
 from simulation import Simulation
 
 
@@ -55,7 +55,7 @@ def main():
         if not args.demo:
             angles = sensors.read()
         else:
-            angles = {'x': 0.0, 'y': 90.0, 'z': 90.0}
+            angles = SensorData(0.0, 90.0, 90.0)
 
         if angles is not None:
             sim.angles = angles

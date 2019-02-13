@@ -106,7 +106,7 @@ class Sensors():
                 ay = -float(angles[1])
                 az = float(angles[0])
 
-                return {'x': ax, 'y': ay, 'z': az}
+                return SensorData(ax, ay, az)
         except Exception as e:
             pass
 
@@ -149,7 +149,7 @@ class Sensors():
             ay = float(angles[1])
             az = float(angles[2])
             # print({'x': ax, 'y': ay, 'z': az})
-            return {'x': ax, 'y': ay, 'z': az}
+            return SensorData(ax, ay, az)
 
     def close(self):
         # self.file.close()
@@ -170,3 +170,21 @@ class Sensors():
         a_z = math.degrees(math.atan2(t_3, t_4))
 
         return (a_x, a_y, a_z)
+
+class SensorData():
+    x = 0
+    y = 0
+    z = 0
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+    def __getitem__(self, key):
+        if key == "x":
+            return self.x
+        if key == "y":
+            return self.y
+        if key == "z":
+            return self.z
+        else:
+            raise KeyError()
