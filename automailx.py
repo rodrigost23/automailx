@@ -38,6 +38,11 @@ def main():
     fps = 0
     ticks = pygame.time.get_ticks()
     while True:
+        if not args.demo:
+            sensor_data = sensors.read()
+        else:
+            sensor_data = SensorData(0.0, 90.0, 90.0)
+
         event = pygame.event.poll()
         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             break
@@ -47,18 +52,17 @@ def main():
             pygame.display.set_mode(event.dict['size'], video_flags)
             sim.resize(*event.dict['size'])
         elif args.demo:
-            if event.type == KEYDOWN and event.key == K_RIGHT:
+            if event.type == KEYDOWN and event.key == K_UP:
                 sim.nextPose()
-            elif event.type == KEYDOWN and event.key == K_LEFT:
+            elif event.type == KEYDOWN and event.key == K_DOWN:
                 sim.prevPose()
+            elif event.type == KEYDOWN and event.key == K_RIGHT:
+                sensor_data.angle = max(0.0, min(90.0, sensor_data.angle + 5))
+            elif event.type == KEYDOWN and event.key == K_LEFT:
+                sensor_data.angle = max(0.0, min(90.0, sensor_data.angle - 5))
 
-        if not args.demo:
-            angles = sensors.read()
-        else:
-            angles = SensorData(0.0, 90.0, 90.0)
-
-        if angles is not None:
-            sim.angles = angles
+        if sensor_data is not None:
+            sim.angles = sensor_data
         sim.draw()
 
         pygame.display.flip()

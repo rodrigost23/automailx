@@ -172,13 +172,50 @@ class Sensors():
         return (a_x, a_y, a_z)
 
 class SensorData():
-    x = 0
-    y = 0
-    z = 0
+    imu = [{
+        'x': 0.0,
+        'y': 0.0,
+        'z': 0.0
+    }]
+
+    @property
+    def x(self):
+        return self.imu[0]["x"]
+
+    @x.setter
+    def x(self, value):
+        self.imu[0]["x"] = value
+
+    @property
+    def y(self):
+        return self.imu[0]["y"]
+
+    @y.setter
+    def y(self, value):
+        self.imu[0]["y"] = value
+
+    @property
+    def z(self):
+        return self.imu[0]["z"]
+
+    @z.setter
+    def z(self, value):
+        self.imu[0]["z"] = value
+
+    flex = [0.0]
+    @property
+    def angle(self):
+        return self.flex[0]
+
+    @angle.setter
+    def angle(self, value):
+        self.flex[0] = value
+
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
+
     def __getitem__(self, key):
         if key == "x":
             return self.x
@@ -186,5 +223,19 @@ class SensorData():
             return self.y
         if key == "z":
             return self.z
+        if key == "angle":
+            return self.angle
+        else:
+            raise KeyError()
+
+    def __setitem__(self, key, value):
+        if key == "x":
+            self.x = value
+        if key == "y":
+            self.y = value
+        if key == "z":
+            self.z = value
+        if key == "angle":
+            self.angle = value
         else:
             raise KeyError()
