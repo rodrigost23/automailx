@@ -2,13 +2,15 @@ import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+from sensors import SensorData
+
 
 class Simulation():
 
     ACCEL = tuple()
     POS = tuple()
     YAW_OFFSET = 0
-    angles = dict(x=0.0, y=0.0, z=0.0)
+    sensor_data = SensorData(0.0, 0.0, 0.0)
     pose = 0
     __num_poses = 2
 
@@ -60,20 +62,20 @@ class Simulation():
         glLoadIdentity()
         glTranslatef(0, 0.0, -7.0)
 
-        osd_line = "pitch: " + str("{0:.2f}".format(self.angles['y'])) + \
-            ", roll: " + str("{0:.2f}".format(self.angles['x'])) + \
-            ", yaw: " + str("{0:.2f}".format(self.angles['z']))
+        osd_line = "pitch: " + str("{0:.2f}".format(self.sensor_data['y'])) + \
+            ", roll: " + str("{0:.2f}".format(self.sensor_data['x'])) + \
+            ", yaw: " + str("{0:.2f}".format(self.sensor_data['z']))
 
         self.drawText((-2, 1.9, 2), osd_line)
         # drawText((2.45, 1.9, 2), "FPS: %d" % fps)
 
         glTranslatef(0, 2.0, 0.0)
         # Yaw,   rotate around y-axis
-        glRotatef(self.angles['z'], 0.0, 1.0, 0.0)
+        glRotatef(self.sensor_data['z'], 0.0, 1.0, 0.0)
         # Pitch, rotate around x-axis
-        glRotatef(self.angles['y'], 1.0, 0.0, 0.0)
+        glRotatef(self.sensor_data['y'], 1.0, 0.0, 0.0)
         # Roll,  rotate around z-axis
-        glRotatef(self.angles['x'], 0.0, 0.0, 1.0)
+        glRotatef(self.sensor_data['x'], 0.0, 0.0, 1.0)
 
         glColor3f(1, 0, 1)
         gluDisk(self.quad, 0, 0.2, 10, 1)
@@ -82,6 +84,10 @@ class Simulation():
         gluCylinder(self.quad, 0.2, 0.15, 2, 10, 1)
 
         glTranslatef(0, 0, 2)
+
+        # Flex sensor:
+        # Pitch, rotate around x-axis
+        glRotatef(self.sensor_data.angle, 1.0, 0.0, 0.0)
 
         glColor3f(0, 1, 0)
         gluDisk(self.quad, 0, 0.15, 10, 1)

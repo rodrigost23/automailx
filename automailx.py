@@ -52,17 +52,18 @@ def main():
             pygame.display.set_mode(event.dict['size'], video_flags)
             sim.resize(*event.dict['size'])
         elif args.demo:
+            keys = pygame.key.get_pressed()  #checking pressed keys
             if event.type == KEYDOWN and event.key == K_UP:
                 sim.nextPose()
             elif event.type == KEYDOWN and event.key == K_DOWN:
                 sim.prevPose()
-            elif event.type == KEYDOWN and event.key == K_RIGHT:
-                sensor_data.angle = max(0.0, min(90.0, sensor_data.angle + 5))
-            elif event.type == KEYDOWN and event.key == K_LEFT:
+            elif keys[pygame.K_RIGHT]:
                 sensor_data.angle = max(0.0, min(90.0, sensor_data.angle - 5))
+            elif keys[pygame.K_LEFT]:
+                sensor_data.angle = max(0.0, min(90.0, sensor_data.angle + 5))
 
         if sensor_data is not None:
-            sim.angles = sensor_data
+            sim.sensor_data = sensor_data
         sim.draw()
 
         pygame.display.flip()
