@@ -11,6 +11,8 @@
 * [i2cdevlib/Arduino/MPU6050](https://github.com/jrowberg/i2cdevlib/tree/6dd5e46eb66539ac3be3f8f8e1b06c7b0373f3cc/Arduino/MPU6050)
 
 ## Python script instructions:
+Run `pip install -r requirements.txt` to get the dependencies.
+
     usage: automailx.py [-h] [--net [port] | --serial [port] | --demo]
 
     optional arguments:
