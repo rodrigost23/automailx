@@ -215,6 +215,9 @@ class SensorData():
     def angle(self, value):
         self.flex[0] = value
 
+    def __str__(self):
+        return "imu(%.1f,%.1f,%.1f) flex(%.1f)" % (self.x, self.y, self.z, self.angle)
+
     def __getitem__(self, key):
         if key == "x":
             return self.x
@@ -238,3 +241,9 @@ class SensorData():
             self.angle = value
         else:
             raise KeyError()
+
+    def __sub__(self, other):
+        difference = SensorData(
+            self.x - other.x, self.y - other.y, self.z - other.z)
+        difference.angle = self.angle
+        return difference
