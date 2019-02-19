@@ -37,11 +37,10 @@ def main():
     frames = 0
     fps = 0
     ticks = pygame.time.get_ticks()
+    sensor_data = SensorData()
     while True:
         if not args.demo:
-            sensor_data = sensors.read()
-        else:
-            sensor_data = SensorData(0.0, 90.0, 90.0)
+            sensor_data = sensors.read() or sensor_data
 
         event = pygame.event.poll()
         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
@@ -51,21 +50,21 @@ def main():
         elif event.type == VIDEORESIZE:
             pygame.display.set_mode(event.dict['size'], video_flags)
             sim.resize(*event.dict['size'])
-        elif args.demo:
-            if event.type == KEYDOWN and event.key == K_UP:
-                sim.nextPose()
-            elif event.type == KEYDOWN and event.key == K_DOWN:
-                sim.prevPose()
-            elif event.type == KEYDOWN and event.key == K_r:
-                sim.recenter()
-            else:
-                keys = pygame.key.get_pressed()  # checking pressed keys
-                if keys[pygame.K_RIGHT]:
-                    sensor_data.angle = max(
-                        0.0, min(90.0, sensor_data.angle - 5))
-                elif keys[pygame.K_LEFT]:
-                    sensor_data.angle = max(
-                        0.0, min(90.0, sensor_data.angle + 5))
+        elif event.type == KEYDOWN and event.key == K_r:
+            sim.recenter()
+        else:
+            keys = pygame.key.get_pressed()  # checking pressed keys
+            if keys[pygame.K_RIGHT]:
+                sensor_data.angle = max(
+                    0.0, min(90.0, sensor_data.angle - 5))
+            elif keys[pygame.K_LEFT]:
+                sensor_data.angle = max(
+                    0.0, min(90.0, sensor_data.angle + 5))
+            elif args.demo:
+                if event.type == KEYDOWN and event.key == K_UP:
+                    sim.nextPose()
+                elif event.type == KEYDOWN and event.key == K_DOWN:
+                    sim.prevPose()
 
         if sensor_data is not None:
             sim.sensor_data = sensor_data

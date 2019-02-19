@@ -77,9 +77,9 @@ class Simulation():
 
         glTranslatef(0, 2.0, 0.0)
         # Yaw,   rotate around y-axis
-        glRotatef(sensor_data['z'], 0.0, 1.0, 0.0)
+        glRotatef(sensor_data['z'] + 90, 0.0, 1.0, 0.0)
         # Pitch, rotate around x-axis
-        glRotatef(sensor_data['y'], 1.0, 0.0, 0.0)
+        glRotatef(sensor_data['y'] + 90, 1.0, 0.0, 0.0)
         # Roll,  rotate around z-axis
         glRotatef(sensor_data['x'], 0.0, 0.0, 1.0)
 
