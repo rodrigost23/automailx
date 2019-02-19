@@ -45,6 +45,12 @@ class Simulation():
         print("set pose %d" % pose)
         self.pose = pose
 
+    def recenter(self, data: SensorData = None):
+        if data == None:
+            data = self.sensor_data
+
+        self.offset = SensorData(*data.data())
+
     def drawText(self, position, textString):
         font = pygame.font.SysFont("Courier", 18, True)
         text_surface = font.render(

@@ -174,14 +174,14 @@ class Sensors():
 
 class SensorData():
 
-    def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0):
+    def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0, angle: float = 0.0):
         self.imu = [{
             'x': x,
             'y': y,
             'z': z
         }]
 
-        self.flex = [0.0]
+        self.flex = [angle]
 
     @property
     def x(self):
@@ -247,3 +247,9 @@ class SensorData():
             self.x - other.x, self.y - other.y, self.z - other.z)
         difference.angle = self.angle
         return difference
+
+    def data(self):
+        yield self.x
+        yield self.y
+        yield self.z
+        yield self.angle
