@@ -8,14 +8,105 @@ from serial import tools
 from serial.tools import list_ports
 
 
+class SensorData():
+
+    def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0, angle: float = 0.0):
+        self.imu = [{
+            'x': x,
+            'y': y,
+            'z': z
+        }]
+
+        self.flex = [angle]
+
+    @property
+    def x(self):
+        return self.imu[0]["x"]
+
+    @x.setter
+    def x(self, value):
+        self.imu[0]["x"] = value
+
+    @property
+    def y(self):
+        return self.imu[0]["y"]
+
+    @y.setter
+    def y(self, value):
+        self.imu[0]["y"] = value
+
+    @property
+    def z(self):
+        return self.imu[0]["z"]
+
+    @z.setter
+    def z(self, value):
+        self.imu[0]["z"] = value
+
+    @property
+    def angle(self):
+        return self.flex[0]
+
+    @angle.setter
+    def angle(self, value):
+        self.flex[0] = value
+
+    def __str__(self):
+        return "imu(%.1f,%.1f,%.1f) flex(%.1f)" % (self.x, self.y, self.z, self.angle)
+
+    def __getitem__(self, key):
+        if key == "x":
+            return self.x
+        if key == "y":
+            return self.y
+        if key == "z":
+            return self.z
+        if key == "angle":
+            return self.angle
+        else:
+            raise KeyError()
+
+    def __setitem__(self, key, value):
+        if key == "x":
+            self.x = value
+        if key == "y":
+            self.y = value
+        if key == "z":
+            self.z = value
+        if key == "angle":
+            self.angle = value
+        else:
+            raise KeyError()
+
+    def __sub__(self, other):
+        difference = SensorData(
+            self.x - other.x, self.y - other.y, self.z - other.z)
+        difference.angle = self.angle
+        return difference
+
+    def data(self):
+        yield self.x
+        yield self.y
+        yield self.z
+        yield self.angle
+
+    def setdata(self, x: float = None, y: float = None, z: float = None, angle: float = None):
+        self.x = x or self.x
+        self.y = y or self.y
+        self.z = z or self.z
+        self.angle = angle or self.angle
+
+
 class Sensors():
     __interval = 0
 
     mode = "serial"
     sock = None
     ser = None
+    data = None
 
     def __init__(self, **kwargs):
+        self.data = SensorData()
         self.mode = "net" if kwargs['net'] else "serial"
         if self.mode == "net":
             print("Receiver IP: ", socket.gethostbyname(socket.gethostname()))
@@ -106,7 +197,8 @@ class Sensors():
                 ay = -float(angles[1])
                 az = float(angles[0])
 
-                return SensorData(ax, ay, az)
+                self.data.setdata(ax, ay, az)
+                return self.data
         except Exception as e:
             pass
 
@@ -149,7 +241,8 @@ class Sensors():
             ay = float(angles[1])
             az = float(angles[2])
             # print({'x': ax, 'y': ay, 'z': az})
-            return SensorData(ax, ay, az)
+            self.data.setdata(ax, ay, az)
+            return self.data
 
     def close(self):
         # self.file.close()
@@ -170,86 +263,3 @@ class Sensors():
         a_z = math.degrees(math.atan2(t_3, t_4))
 
         return (a_x, a_y, a_z)
-
-
-class SensorData():
-
-    def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0, angle: float = 0.0):
-        self.imu = [{
-            'x': x,
-            'y': y,
-            'z': z
-        }]
-
-        self.flex = [angle]
-
-    @property
-    def x(self):
-        return self.imu[0]["x"]
-
-    @x.setter
-    def x(self, value):
-        self.imu[0]["x"] = value
-
-    @property
-    def y(self):
-        return self.imu[0]["y"]
-
-    @y.setter
-    def y(self, value):
-        self.imu[0]["y"] = value
-
-    @property
-    def z(self):
-        return self.imu[0]["z"]
-
-    @z.setter
-    def z(self, value):
-        self.imu[0]["z"] = value
-
-    @property
-    def angle(self):
-        return self.flex[0]
-
-    @angle.setter
-    def angle(self, value):
-        self.flex[0] = value
-
-    def __str__(self):
-        return "imu(%.1f,%.1f,%.1f) flex(%.1f)" % (self.x, self.y, self.z, self.angle)
-
-    def __getitem__(self, key):
-        if key == "x":
-            return self.x
-        if key == "y":
-            return self.y
-        if key == "z":
-            return self.z
-        if key == "angle":
-            return self.angle
-        else:
-            raise KeyError()
-
-    def __setitem__(self, key, value):
-        if key == "x":
-            self.x = value
-        if key == "y":
-            self.y = value
-        if key == "z":
-            self.z = value
-        if key == "angle":
-            self.angle = value
-        else:
-            raise KeyError()
-
-    def __sub__(self, other):
-        difference = SensorData(
-            self.x - other.x, self.y - other.y, self.z - other.z)
-        difference.angle = self.angle
-        return difference
-
-    def data(self):
-        yield self.x
-        yield self.y
-        yield self.z
-        yield self.angle
