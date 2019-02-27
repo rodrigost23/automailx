@@ -1,5 +1,5 @@
 # AutomailX
-[![CircleCI](https://circleci.com/gh/rodrigost23/automailx.svg?style=shield)](https://circleci.com/gh/rodrigost23/automailx)
+[![CircleCI](https://circleci.com/gh/rodrigost23/automailx.svg?style=shield&circle-token=67feb067e3f7a0dd1a27d8a9de1ec440112a0a93)](https://circleci.com/gh/rodrigost23/automailx)
 
 | File                             | Description                                        |
 |----------------------------------|----------------------------------------------------|
