@@ -24,7 +24,7 @@ def main():
         args = parser.parse_args(['--serial'])
 
     if not args.demo:
-        sensors = Sensors(net=args.net, serial=args.serial)
+        sensors = Sensors(net_port=args.net, serial_port=args.serial)
 
     video_flags = OPENGL | DOUBLEBUF | RESIZABLE
 

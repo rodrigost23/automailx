@@ -105,19 +105,19 @@ class Sensors():
     ser = None
     data = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, net_port=False, serial_port=True):
         self.data = SensorData()
-        self.mode = "net" if kwargs['net'] else "serial"
+        self.mode = "net" if net_port else "serial"
         if self.mode == "net":
             print("Receiver IP: ", socket.gethostbyname(socket.gethostname()))
-            udp_port = kwargs['net']
+            udp_port = net_port
             # UDP_PORT = int(raw_input ("Enter Port "))
             print("Port: ", udp_port)
             self.sock = socket.socket(socket.AF_INET,  # Internet
                                       socket.SOCK_DGRAM)  # UDP
             self.sock.bind(("0.0.0.0", udp_port))
         else:
-            port = kwargs['serial']
+            port = serial_port
             serial.tools.list_ports.grep
 
             try:
