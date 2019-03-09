@@ -54,17 +54,23 @@ class SensorData():
     def __str__(self):
         return "imu(%.1f,%.1f,%.1f) flex(%.1f)" % (self.x, self.y, self.z, self.angle)
 
+    def __len__(self):
+        return 4
+
     def __getitem__(self, key):
-        if key == "x":
+        if (key == "x") or (key == 0):
             return self.x
-        if key == "y":
+        if (key == "y") or (key == 1):
             return self.y
-        if key == "z":
+        if (key == "z") or (key == 2):
             return self.z
-        if key == "angle":
+        if (key == "angle") or (key == 3):
             return self.angle
         else:
-            raise KeyError()
+            if isinstance(key, int) and key >= self.__len__():
+                raise IndexError()
+            else:
+                raise KeyError(key)
 
     def __setitem__(self, key, value):
         if key == "x":
