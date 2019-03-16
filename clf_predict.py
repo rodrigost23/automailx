@@ -10,8 +10,7 @@ from collections import deque
 import numpy as np
 import pandas as pd
 from sklearn import model_selection
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 import sensors
 
@@ -38,7 +37,7 @@ X_train, X_test, y_train, y_test = model_selection.train_test_split(
     random_state=100)
 
 # classifier
-clf = GradientBoostingClassifier()
+clf = DecisionTreeClassifier()
 
 kfold = model_selection.KFold(n_splits=10, random_state=seed)
 scoring = 'accuracy'

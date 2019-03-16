@@ -44,41 +44,51 @@ def main():
 
         print("\n ACTIVITY %d:" % (i + 1))
         start_time = None
-        elapsed_time = None
+        total_time = None
+        record_time = 0
+        reply = None
         dq = deque()
 
-        try:
-            while duration is None or start_time is None or elapsed_time <= duration:
+        while duration is None or start_time is None or total_time <= duration:
+            try:
                 data = s.read()
                 if data is None:
                     continue
                 elif start_time is None:
                     start_time = time.time()
-                elapsed_time = time.time() - start_time
+                    record_time = start_time - 0.5
 
-                print("\r", end='')
-                if elapsed_time is not None and start_time is not None:
-                    print("[%ds] " % (elapsed_time), end='')
+                total_time = time.time() - start_time
 
-                print(str(data) + " " * 5, end='')
-                dq.append({'time': elapsed_time, 'data': sensors.SensorData(*data.data())})
-                if dq and elapsed_time - dq[0]['time'] >= 1 : # if time more than 1 second
+                print("\r[%ds] " % (total_time), end='')
+                print(str(data) + " " * 10, end='')
+
+                if time.time() - record_time >= 0.5:
+                    record_time = time.time()
+                    dq.append({'time': total_time, 'data': sensors.SensorData(*data.data())})
+                if dq and total_time - dq[0]['time'] >= 1 : # if time more than 1 second
                     save_data = data - dq.popleft()['data']
                     with open(filename, "a", newline='') as csv_file:
                         csv_writer = csv.writer(csv_file)
                         csv_writer.writerow([i] + list(save_data.data()))
-                    print("        Saved %s" % (save_data), end='')
+                    print("    Saved %s      " % (save_data), end='')
+            except KeyboardInterrupt:
+                print()
+                reply = input("\n\n(C)ontinue, (q)uit, or next (a)ctivity?" + " " * 100)
+                if reply == "a" or reply == "A" or reply == "q" or reply == "Q":
+                    break
+                else:
+                    start_time = time.time()
+                    dq.clear()
+                    continue
 
-
-            print("\r[%ds] " % (elapsed_time), end='')
-
-            i += 1
-            if not i >= activities:
-                input("Press ENTER to continue" + " " * 100)
-
-        except KeyboardInterrupt:
-            print("Interrupted." + " " * 36)
+        print("\r[%ds] " % (total_time), end='')
+        if reply == "q" or reply == "Q":
             break
+
+        i += 1
+        if not i >= activities and not (reply == "a" or reply == "A"):
+            input("Press ENTER to continue")
 
 
 if __name__ == "__main__":
