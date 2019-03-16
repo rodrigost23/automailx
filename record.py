@@ -3,6 +3,7 @@ import csv
 import errno
 import os
 import time
+from collections import deque
 
 import sensors
 
@@ -36,14 +37,15 @@ def main():
 
     # Start reading from serial port
     s = sensors.Sensors()
-    print("Press Ctrl+C to terminate.\n")
+    print("Press Ctrl+C to terminate.")
 
     i = 0
     while i < activities:
 
-        print(" ACTIVITY %d:" % (i + 1))
+        print("\n ACTIVITY %d:" % (i + 1))
         start_time = None
         elapsed_time = None
+        dq = deque()
 
         try:
             while duration is None or start_time is None or elapsed_time <= duration:
@@ -52,21 +54,27 @@ def main():
                     continue
                 elif start_time is None:
                     start_time = time.time()
+                elapsed_time = time.time() - start_time
 
+                print("\r", end='')
                 if elapsed_time is not None and start_time is not None:
                     print("[%ds] " % (elapsed_time), end='')
 
-                print(str(data) + " " * 10, end='\r')
-                with open(filename, "a", newline='') as csv_file:
-                    csv_writer = csv.writer(csv_file)
-                    csv_writer.writerow([i] + list(data.data()))
+                print(str(data) + " " * 5, end='')
+                dq.append({'time': elapsed_time, 'data': sensors.SensorData(*data.data())})
+                if dq and elapsed_time - dq[0]['time'] >= 1 : # if time more than 1 second
+                    save_data = data - dq.popleft()['data']
+                    with open(filename, "a", newline='') as csv_file:
+                        csv_writer = csv.writer(csv_file)
+                        csv_writer.writerow([i] + list(save_data.data()))
+                    print("        Saved %s" % (save_data), end='')
 
-                elapsed_time = time.time() - start_time
-            print("[%ds] " % (elapsed_time), end='')
+
+            print("\r[%ds] " % (elapsed_time), end='')
 
             i += 1
             if not i >= activities:
-                input("Press ENTER to continue" + " " * 30)
+                input("Press ENTER to continue" + " " * 100)
 
         except KeyboardInterrupt:
             print("Interrupted." + " " * 36)
