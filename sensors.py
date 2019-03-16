@@ -87,7 +87,7 @@ class SensorData():
     def __sub__(self, other):
         difference = SensorData(
             self.x - other.x, self.y - other.y, self.z - other.z)
-        difference.angle = self.angle
+        difference.angle = self.angle - other.angle
         return difference
 
     def data(self):
