@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import argparse
-from struct import *
 
 import pygame
-from pygame.locals import *
+from pygame.locals import (DOUBLEBUF, K_DOWN, K_ESCAPE, K_UP, KEYDOWN, OPENGL,
+                           QUIT, RESIZABLE, VIDEORESIZE, K_r)
 
 from sensors import SensorData, Sensors
 from simulation import Simulation
+from clf_predict import Predict
 
 
 def main():
@@ -38,6 +39,7 @@ def main():
     fps = 0
     ticks = pygame.time.get_ticks()
     sensor_data = SensorData()
+    p = Predict()
     while True:
         if not args.demo:
             sensor_data = sensors.read() or sensor_data
@@ -68,6 +70,7 @@ def main():
 
         if sensor_data is not None:
             sim.sensor_data = sensor_data
+            sim.setPose(p.predict(sensor_data) or 0)
         sim.draw()
 
         pygame.display.flip()
