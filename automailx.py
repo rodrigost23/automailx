@@ -70,7 +70,8 @@ def main():
 
         if sensor_data is not None:
             sim.sensor_data = sensor_data
-            sim.setPose(p.predict(sensor_data) or 0)
+            if not args.demo:
+                sim.setPose(p.predict(sensor_data) or 0)
         sim.draw()
 
         pygame.display.flip()
