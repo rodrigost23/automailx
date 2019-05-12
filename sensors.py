@@ -1,3 +1,5 @@
+"""Reads sensor data and deals with them
+"""
 import math
 import socket
 import time
@@ -9,6 +11,8 @@ from serial.tools import list_ports
 
 
 class SensorData():
+    """Stores sensor data including orientation and angle
+    """
 
     def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0, angle: float = 0.0):
         self.imu = [{
@@ -21,34 +25,50 @@ class SensorData():
 
     @property
     def x(self):
+        """Gets x for the imu sensor
+        """
         return self.imu[0]["x"]
 
     @x.setter
     def x(self, value):
+        """Sets x for the imu sensor
+        """
         self.imu[0]["x"] = value
 
     @property
     def y(self):
+        """Gets y for the imu sensor
+        """
         return self.imu[0]["y"]
 
     @y.setter
     def y(self, value):
+        """Sets y for the imu sensor
+        """
         self.imu[0]["y"] = value
 
     @property
     def z(self):
+        """Gets z for the imu sensor
+        """
         return self.imu[0]["z"]
 
     @z.setter
     def z(self, value):
+        """Sets z for the imu sensor
+        """
         self.imu[0]["z"] = value
 
     @property
     def angle(self):
+        """Gets angle for the flex sensor
+        """
         return self.flex[0]
 
     @angle.setter
     def angle(self, value):
+        """Sets angle for the flex sensor
+        """
         self.flex[0] = value
 
     def __str__(self):
@@ -58,28 +78,28 @@ class SensorData():
         return 4
 
     def __getitem__(self, key):
-        if (key == "x") or (key == 0):
+        if key in ("x", 0):
             return self.x
-        if (key == "y") or (key == 1):
+        if key in ("y", 1):
             return self.y
-        if (key == "z") or (key == 2):
+        if key in ("z", 2):
             return self.z
-        if (key == "angle") or (key == 3):
+        if key in ("angle", 3):
             return self.angle
+
+        if isinstance(key, int) and key >= self.__len__():
+            raise IndexError()
         else:
-            if isinstance(key, int) and key >= self.__len__():
-                raise IndexError()
-            else:
-                raise KeyError(key)
+            raise KeyError(key)
 
     def __setitem__(self, key, value):
-        if key == "x":
+        if key in ("x", 0):
             self.x = value
-        if key == "y":
+        if key in ("y", 1):
             self.y = value
-        if key == "z":
+        if key in ("z", 2):
             self.z = value
-        if key == "angle":
+        if key in ("angle", 3):
             self.angle = value
         else:
             raise KeyError()
@@ -104,6 +124,8 @@ class SensorData():
 
 
 class Sensors():
+    """Reads sensor data from UDP or serial ports
+    """
     __interval = 0
 
     mode = "serial"
@@ -112,6 +134,11 @@ class Sensors():
     data = None
 
     def __init__(self, net_port=False, serial_port=True):
+        """
+        Keyword Arguments:
+            net_port {int|bool} -- UDP port or {False} if not UDP (default: {False})
+            serial_port {str|bool} -- Serial port or {False} if not serial (default: {True})
+        """
         self.data = SensorData()
         self.mode = "net" if net_port else "serial"
         if self.mode == "net":
@@ -144,6 +171,8 @@ class Sensors():
             self.ser = serial.Serial(port, baud_rate, timeout=1)
 
     def read(self):
+        """Reads data from source defined in {mode}.
+        """
         if self.mode == "net":
             return self.__readsocket()
         else:
@@ -251,10 +280,14 @@ class Sensors():
             return self.data
 
     def close(self):
+        """Not implemented. Meant to be used if file source is ever implemented.
+        """
         # self.file.close()
         pass
 
     def quaternion_to_euler_angle(self, w, x, y, z):
+        """Converts quaternion to euler angles
+        """
         t_0 = +2.0 * (w * x + y * z)
         t_1 = +1.0 - 2.0 * (x * x + y * y)
         a_x = math.degrees(math.atan2(t_0, t_1))

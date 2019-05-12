@@ -1,3 +1,5 @@
+"""Shows a 3D simulation of a leg prosthesis
+"""
 import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -6,7 +8,8 @@ from sensors import SensorData
 
 
 class Simulation():
-
+    """Shows a 3D simulation of a leg prosthesis
+    """
     sensor_data = SensorData(0.0, 0.0, 0.0)
     offset = SensorData(0.0, 0.0, 0.0)
     pose = 0
@@ -22,7 +25,12 @@ class Simulation():
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
 
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int):
+        """
+        Arguments:
+            width {int} -- Window width in pixels
+            height {int} -- Window height in pixels
+        """
         self.resize(width, height)
         glShadeModel(GL_SMOOTH)
         glClearColor(0.0, 0.0, 0.0, 0.0)
@@ -36,17 +44,32 @@ class Simulation():
         gluQuadricTexture(self.quad, GL_TRUE)
 
     def nextPose(self):
+        """Show next pose of the foot
+        """
         self.setPose((self.pose + 1) % self.__num_poses)
 
     def prevPose(self):
+        """Show previous pose of the foot
+        """
         self.setPose((self.pose - 1) % self.__num_poses)
 
-    def setPose(self, pose):
+    def setPose(self, pose: int):
+        """Sets a specific pose
+
+        Arguments:
+            pose {int} -- The pose number
+        """
         print("set pose %d" % pose)
         self.pose = pose
 
     def recenter(self, data: SensorData = None):
-        if data == None:
+        """Sets an offset to define the resting standing pose
+
+        Keyword Arguments:
+            data {SensorData} -- the sensor data to set as the resting pose, or
+            {None} to set the current sensor data (default: {None})
+        """
+        if data is None:
             data = self.sensor_data
 
         self.offset = SensorData(*data.data())
@@ -61,6 +84,8 @@ class Simulation():
                      GL_RGBA, GL_UNSIGNED_BYTE, text_data)
 
     def draw(self):
+        """Draws one frame in the OpenGL window
+        """
         sensor_data = self.sensor_data - self.offset
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
