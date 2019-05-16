@@ -3,6 +3,7 @@
 import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from pyquaternion import Quaternion
 
 from sensors import SensorData
 
@@ -10,8 +11,8 @@ from sensors import SensorData
 class Simulation():
     """Shows a 3D simulation of a leg prosthesis
     """
-    sensor_data = SensorData(0.0, 0.0, 0.0)
-    offset = SensorData(0.0, 0.0, 0.0)
+    sensor_data = SensorData(0.0, 0.0, 0.0, 0.0)
+    offset = SensorData(0.0, 0.0, 0.0, 0.0)
     pose = 0
     __num_poses = 2
 
@@ -86,27 +87,26 @@ class Simulation():
     def draw(self):
         """Draws one frame in the OpenGL window
         """
-        sensor_data = self.sensor_data - self.offset
+        sensor_data = self.sensor_data
+        quat = Quaternion(sensor_data.w, sensor_data.x, sensor_data.y, sensor_data.z)
+        offset = Quaternion(self.offset.w, self.offset.x, self.offset.y, self.offset.z)
+        if offset:
+            quat = quat * offset.inverse
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         glLoadIdentity()
         glTranslatef(0, 0.0, -7.0)
 
-        osd_line = "pitch: " + str("{0:.2f}".format(sensor_data['y'])) + \
-            ", roll: " + str("{0:.2f}".format(sensor_data['x'])) + \
-            ", yaw: " + str("{0:.2f}".format(sensor_data['z']))
+        osd_line = "pitch: " + str("{0:.2f}".format(sensor_data.ay)) + \
+            ", roll: " + str("{0:.2f}".format(sensor_data.ax)) + \
+            ", yaw: " + str("{0:.2f}".format(sensor_data.az))
 
         self.drawText((-2, 1.9, 2), osd_line)
-        # drawText((2.45, 1.9, 2), "FPS: %d" % fps)
 
         glTranslatef(0, 2.0, 0.0)
-        # Yaw,   rotate around y-axis
-        glRotatef(sensor_data['z'] + 90, 0.0, 1.0, 0.0)
-        # Pitch, rotate around x-axis
-        glRotatef(sensor_data['y'] + 90, 1.0, 0.0, 0.0)
-        # Roll,  rotate around z-axis
-        glRotatef(sensor_data['x'], 0.0, 0.0, 1.0)
+        glRotatef(120, .5, .5, -.5)
+        glRotatef(quat.degrees, -quat.x, quat.z, quat.y)
 
         glColor3f(1, 0, 1)
         gluDisk(self.quad, 0, 0.2, 10, 1)

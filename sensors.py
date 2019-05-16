@@ -9,19 +9,49 @@ import serial
 from serial import tools
 from serial.tools import list_ports
 
+def quat_to_euler(w, x, y, z):
+    """Converts quaternion to euler angles
+    """
+    t_0 = +2.0 * (w * x + y * z)
+    t_1 = +1.0 - 2.0 * (x * x + y * y)
+    a_x = math.degrees(math.atan2(t_0, t_1))
+
+    t_2 = +2.0 * (w * y - z * x)
+    t_2 = +1.0 if t_2 > +1.0 else t_2
+    t_2 = -1.0 if t_2 < -1.0 else t_2
+    a_y = math.degrees(math.asin(t_2))
+
+    t_3 = +2.0 * (w * z + x * y)
+    t_4 = +1.0 - 2.0 * (y * y + z * z)
+    a_z = math.degrees(math.atan2(t_3, t_4))
+
+    return (a_x, a_y, a_z)
 
 class SensorData():
     """Stores sensor data including orientation and angle
     """
 
-    def __init__(self, x: float = 0.0, y: float = 0.0, z: float = 0.0, angle: float = 0.0):
+    def __init__(self, w: float = 0.0, x: float = 0.0, y: float = 0.0, z: float = 0.0, angle: float = 0.0):
         self.imu = [{
+            'w': w,
             'x': x,
             'y': y,
             'z': z
         }]
 
         self.flex = [angle]
+
+    @property
+    def w(self):
+        """Gets w for the imu sensor
+        """
+        return self.imu[0]["w"]
+
+    @w.setter
+    def w(self, value):
+        """Sets w for the imu sensor
+        """
+        self.imu[0]["w"] = value
 
     @property
     def x(self):
@@ -71,20 +101,40 @@ class SensorData():
         """
         self.flex[0] = value
 
+    @property
+    def ax(self):
+        """Gets x angle
+        """
+        return quat_to_euler(self.w, self.x, self.y, self.z)[0]
+
+    @property
+    def ay(self):
+        """Gets y angle
+        """
+        return quat_to_euler(self.w, self.x, self.y, self.z)[1]
+
+    @property
+    def az(self):
+        """Gets z angle
+        """
+        return quat_to_euler(self.w, self.x, self.y, self.z)[2]
+
     def __str__(self):
-        return "imu(%.1f,%.1f,%.1f) flex(%.1f)" % (self.x, self.y, self.z, self.angle)
+        return "imu(%.1f,%.1f,%.1f,%.1f) flex(%.1f)" % (self.w, self.x, self.y, self.z, self.angle)
 
     def __len__(self):
-        return 4
+        return 5
 
     def __getitem__(self, key):
-        if key in ("x", 0):
+        if key in ("w", 0):
+            return self.w
+        if key in ("x", 1):
             return self.x
-        if key in ("y", 1):
+        if key in ("y", 2):
             return self.y
-        if key in ("z", 2):
+        if key in ("z", 3):
             return self.z
-        if key in ("angle", 3):
+        if key in ("angle", 4):
             return self.angle
 
         if isinstance(key, int) and key >= self.__len__():
@@ -93,30 +143,33 @@ class SensorData():
             raise KeyError(key)
 
     def __setitem__(self, key, value):
-        if key in ("x", 0):
+        if key in ("w", 0):
+            self.w = value
+        if key in ("x", 1):
             self.x = value
-        if key in ("y", 1):
+        if key in ("y", 2):
             self.y = value
-        if key in ("z", 2):
+        if key in ("z", 3):
             self.z = value
-        if key in ("angle", 3):
+        if key in ("angle", 4):
             self.angle = value
         else:
             raise KeyError()
 
     def __sub__(self, other):
         difference = SensorData(
-            self.x - other.x, self.y - other.y, self.z - other.z)
-        difference.angle = self.angle - other.angle
+            self.w - other.w, self.x - other.x, self.y - other.y, self.z - other.z, self.angle - other.angle)
         return difference
 
     def data(self):
+        yield self.w
         yield self.x
         yield self.y
         yield self.z
         yield self.angle
 
-    def setdata(self, x: float = None, y: float = None, z: float = None, angle: float = None):
+    def setdata(self, w: float = None, x: float = None, y: float = None, z: float = None, angle: float = None):
+        self.w = w or self.w
         self.x = x or self.x
         self.y = y or self.y
         self.z = z or self.z
@@ -268,15 +321,14 @@ class Sensors():
             for i, _ in enumerate(range(4)):
                 if (q[i] >= 2):
                     q[i] = -4 + q[i]
-            # TODO: Use quaternion directly
-            angles = self.quaternion_to_euler_angle(*q)
+            angles = q
 
-        if len(angles) == 3:
-            ax = float(angles[0])
-            ay = float(angles[1])
-            az = float(angles[2])
-            # print({'x': ax, 'y': ay, 'z': az})
-            self.data.setdata(ax, ay, az)
+        if len(angles) == 4:
+            aw = float(angles[0])
+            ax = float(angles[1])
+            ay = float(angles[2])
+            az = float(angles[3])
+            self.data.setdata(aw, ax, ay, az)
             return self.data
 
     def close(self):
@@ -284,21 +336,3 @@ class Sensors():
         """
         # self.file.close()
         pass
-
-    def quaternion_to_euler_angle(self, w, x, y, z):
-        """Converts quaternion to euler angles
-        """
-        t_0 = +2.0 * (w * x + y * z)
-        t_1 = +1.0 - 2.0 * (x * x + y * y)
-        a_x = math.degrees(math.atan2(t_0, t_1))
-
-        t_2 = +2.0 * (w * y - z * x)
-        t_2 = +1.0 if t_2 > +1.0 else t_2
-        t_2 = -1.0 if t_2 < -1.0 else t_2
-        a_y = math.degrees(math.asin(t_2))
-
-        t_3 = +2.0 * (w * z + x * y)
-        t_4 = +1.0 - 2.0 * (y * y + z * z)
-        a_z = math.degrees(math.atan2(t_3, t_4))
-
-        return (a_x, a_y, a_z)
