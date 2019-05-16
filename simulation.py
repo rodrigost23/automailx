@@ -1,8 +1,8 @@
 """Shows a 3D simulation of a leg prosthesis
 """
+import OpenGL.GL as gl
+import OpenGL.GLU as glu
 import pygame
-from OpenGL.GL import *
-from OpenGL.GLU import *
 from pyquaternion import Quaternion
 
 from sensors import SensorData
@@ -19,12 +19,12 @@ class Simulation():
     def resize(self, width, height):
         if height == 0:
             height = 1
-        glViewport(0, 0, width, height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(45, 1.0*width/height, 0.1, 100.0)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
+        gl.glViewport(0, 0, width, height)
+        gl.glMatrixMode(gl.GL_PROJECTION)
+        gl.glLoadIdentity()
+        glu.gluPerspective(45, 1.0*width/height, 0.1, 100.0)
+        gl.glMatrixMode(gl.GL_MODELVIEW)
+        gl.glLoadIdentity()
 
     def __init__(self, width: int, height: int):
         """
@@ -33,16 +33,16 @@ class Simulation():
             height {int} -- Window height in pixels
         """
         self.resize(width, height)
-        glShadeModel(GL_SMOOTH)
-        glClearColor(0.0, 0.0, 0.0, 0.0)
-        glClearDepth(1.0)
-        glEnable(GL_DEPTH_TEST)
-        glDepthFunc(GL_LEQUAL)
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
+        gl.glShadeModel(gl.GL_SMOOTH)
+        gl.glClearColor(0.0, 0.0, 0.0, 0.0)
+        gl.glClearDepth(1.0)
+        gl.glEnable(gl.GL_DEPTH_TEST)
+        gl.glDepthFunc(gl.GL_LEQUAL)
+        gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST)
 
-        self.quad = gluNewQuadric()
-        gluQuadricDrawStyle(self.quad, GL_LINE)
-        gluQuadricTexture(self.quad, GL_TRUE)
+        self.quad = glu.gluNewQuadric()
+        glu.gluQuadricDrawStyle(self.quad, gl.GL_LINE)
+        glu.gluQuadricTexture(self.quad, gl.GL_TRUE)
 
     def nextPose(self):
         """Show next pose of the foot
@@ -80,23 +80,25 @@ class Simulation():
         text_surface = font.render(
             textString, True, (255, 255, 255, 255), (0, 0, 0, 255))
         text_data = pygame.image.tostring(text_surface, "RGBA", True)
-        glRasterPos3d(*position)
-        glDrawPixels(text_surface.get_width(), text_surface.get_height(),
-                     GL_RGBA, GL_UNSIGNED_BYTE, text_data)
+        gl.glRasterPos3d(*position)
+        gl.glDrawPixels(text_surface.get_width(), text_surface.get_height(),
+                        gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, text_data)
 
     def draw(self):
         """Draws one frame in the OpenGL window
         """
         sensor_data = self.sensor_data
-        quat = Quaternion(sensor_data.w, sensor_data.x, sensor_data.y, sensor_data.z)
-        offset = Quaternion(self.offset.w, self.offset.x, self.offset.y, self.offset.z)
+        quat = Quaternion(sensor_data.w, sensor_data.x,
+                          sensor_data.y, sensor_data.z)
+        offset = Quaternion(self.offset.w, self.offset.x,
+                            self.offset.y, self.offset.z)
         if offset:
             quat = quat * offset.inverse
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 
-        glLoadIdentity()
-        glTranslatef(0, 0.0, -7.0)
+        gl.glLoadIdentity()
+        gl.glTranslatef(0, 0.0, -7.0)
 
         osd_line = "pitch: " + str("{0:.2f}".format(sensor_data.ay)) + \
             ", roll: " + str("{0:.2f}".format(sensor_data.ax)) + \
@@ -104,131 +106,131 @@ class Simulation():
 
         self.drawText((-2, 1.9, 2), osd_line)
 
-        glTranslatef(0, 2.0, 0.0)
-        glRotatef(120, .5, .5, -.5)
-        glRotatef(quat.degrees, -quat.x, quat.z, quat.y)
+        gl.glTranslatef(0, 2.0, 0.0)
+        gl.glRotatef(120, .5, .5, -.5)
+        gl.glRotatef(quat.degrees, -quat.x, quat.z, quat.y)
 
-        glColor3f(1, 0, 1)
-        gluDisk(self.quad, 0, 0.2, 10, 1)
+        gl.glColor3f(1, 0, 1)
+        glu.gluDisk(self.quad, 0, 0.2, 10, 1)
 
-        glColor3f(0, 0, 1)
-        gluCylinder(self.quad, 0.2, 0.15, 2, 10, 1)
+        gl.glColor3f(0, 0, 1)
+        glu.gluCylinder(self.quad, 0.2, 0.15, 2, 10, 1)
 
-        glTranslatef(0, 0, 2)
+        gl.glTranslatef(0, 0, 2)
 
         # Flex sensor:
         # Pitch, rotate around x-axis
-        glRotatef(self.sensor_data.angle, 1.0, 0.0, 0.0)
+        gl.glRotatef(self.sensor_data.angle, 1.0, 0.0, 0.0)
 
-        glColor3f(0, 1, 0)
-        gluDisk(self.quad, 0, 0.15, 10, 1)
-        gluSphere(self.quad, 0.2, 6, 6)
+        gl.glColor3f(0, 1, 0)
+        glu.gluDisk(self.quad, 0, 0.15, 10, 1)
+        glu.gluSphere(self.quad, 0.2, 6, 6)
 
-        glColor3f(0.2, 0.4, 1)
-        gluCylinder(self.quad, 0.15, 0.125, 1.8, 9, 1)
+        gl.glColor3f(0.2, 0.4, 1)
+        glu.gluCylinder(self.quad, 0.15, 0.125, 1.8, 9, 1)
 
-        glTranslatef(0, 0, 1.8)
-        glColor3f(0, 1, 0)
-        gluDisk(self.quad, 0, 0.125, 9, 1)
+        gl.glTranslatef(0, 0, 1.8)
+        gl.glColor3f(0, 1, 0)
+        glu.gluDisk(self.quad, 0, 0.125, 9, 1)
 
         # First part of foot
 
         if self.pose == 0:
             pass
         elif self.pose == 1:
-            glRotatef(60.0, 1.0, 0.0, 0.0)
+            gl.glRotatef(60.0, 1.0, 0.0, 0.0)
 
-        glColor3f(0, 1, 0)
-        gluDisk(self.quad, 0, 0.15, 10, 1)
-        gluSphere(self.quad, 0.2, 6, 6)
+        gl.glColor3f(0, 1, 0)
+        glu.gluDisk(self.quad, 0, 0.15, 10, 1)
+        glu.gluSphere(self.quad, 0.2, 6, 6)
 
-        glBegin(GL_QUADS)
+        gl.glBegin(gl.GL_QUADS)
 
-        glColor3f(1.0, 1.0, 0.0)  # Yellow
-        glVertex3f(-0.2, -0.1, 0.0)
-        glVertex3f(0.2, -0.1, 0.0)
-        glVertex3f(0.2, -0.1, 0.3)
-        glVertex3f(-0.2, -0.1, 0.3)
+        gl.glColor3f(1.0, 1.0, 0.0)  # Yellow
+        gl.glVertex3f(-0.2, -0.1, 0.0)
+        gl.glVertex3f(0.2, -0.1, 0.0)
+        gl.glVertex3f(0.2, -0.1, 0.3)
+        gl.glVertex3f(-0.2, -0.1, 0.3)
 
-        glColor3f(1.0, 0.5, 0.0)  # Orange
-        glVertex3f(-0.2, -0.1, 0.3)
-        glVertex3f(-0.2, 0.8, 0.3)
-        glVertex3f(-0.2, 0.8, 0.1)
-        glVertex3f(-0.2, -0.1, 0.0)
+        gl.glColor3f(1.0, 0.5, 0.0)  # Orange
+        gl.glVertex3f(-0.2, -0.1, 0.3)
+        gl.glVertex3f(-0.2, 0.8, 0.3)
+        gl.glVertex3f(-0.2, 0.8, 0.1)
+        gl.glVertex3f(-0.2, -0.1, 0.0)
 
-        glColor3f(1.0, 0.5, 0.0)  # Orange
-        glVertex3f(0.2, -0.1, 0.3)
-        glVertex3f(0.2, 0.8, 0.3)
-        glVertex3f(0.2, 0.8, 0.1)
-        glVertex3f(0.2, -0.1, 0.0)
+        gl.glColor3f(1.0, 0.5, 0.0)  # Orange
+        gl.glVertex3f(0.2, -0.1, 0.3)
+        gl.glVertex3f(0.2, 0.8, 0.3)
+        gl.glVertex3f(0.2, 0.8, 0.1)
+        gl.glVertex3f(0.2, -0.1, 0.0)
 
-        glColor3f(1.0, 0.0, 1.0)  # Magenta
-        glVertex3f(-0.2, -0.1, 0.0)
-        glVertex3f(-0.2, 0.8, 0.1)
-        glVertex3f(0.2, 0.8, 0.1)
-        glVertex3f(0.2, -0.1, 0.0)
+        gl.glColor3f(1.0, 0.0, 1.0)  # Magenta
+        gl.glVertex3f(-0.2, -0.1, 0.0)
+        gl.glVertex3f(-0.2, 0.8, 0.1)
+        gl.glVertex3f(0.2, 0.8, 0.1)
+        gl.glVertex3f(0.2, -0.1, 0.0)
 
-        glColor3f(0.0, 0.0, 1.0)  # Blue
-        glVertex3f(-0.2, -0.1, 0.3)
-        glVertex3f(-0.2, 0.8, 0.3)
-        glVertex3f(0.2, 0.8, 0.3)
-        glVertex3f(0.2, -0.1, 0.3)
+        gl.glColor3f(0.0, 0.0, 1.0)  # Blue
+        gl.glVertex3f(-0.2, -0.1, 0.3)
+        gl.glVertex3f(-0.2, 0.8, 0.3)
+        gl.glVertex3f(0.2, 0.8, 0.3)
+        gl.glVertex3f(0.2, -0.1, 0.3)
 
-        glColor3f(1.0, 0.0, 0.0)  # Red
-        glVertex3f(-0.2, 0.8, 0.3)
-        glVertex3f(-0.2, 0.8, 0.1)
-        glVertex3f(0.2, 0.8, 0.1)
-        glVertex3f(0.2, 0.8, 0.3)
+        gl.glColor3f(1.0, 0.0, 0.0)  # Red
+        gl.glVertex3f(-0.2, 0.8, 0.3)
+        gl.glVertex3f(-0.2, 0.8, 0.1)
+        gl.glVertex3f(0.2, 0.8, 0.1)
+        gl.glVertex3f(0.2, 0.8, 0.3)
 
-        glEnd()
-        glTranslatef(0, 0.8, 0.1)
+        gl.glEnd()
+        gl.glTranslatef(0, 0.8, 0.1)
 
         # Second part of foot
 
         if self.pose == 0:
             pass
         elif self.pose == 1:
-            glRotatef(-60.0, 1.0, 0.0, 0.0)
+            gl.glRotatef(-60.0, 1.0, 0.0, 0.0)
 
-        glColor3f(0, 1, 0)
-        gluSphere(self.quad, 0.1, 6, 6)
+        gl.glColor3f(0, 1, 0)
+        glu.gluSphere(self.quad, 0.1, 6, 6)
 
-        glBegin(GL_QUADS)
+        gl.glBegin(gl.GL_QUADS)
 
-        glColor3f(1.0, 1.0, 0.0)  # Yellow
-        glVertex3f(-0.2, 0.02, 0.0)
-        glVertex3f(0.2, 0.02, 0.0)
-        glVertex3f(0.2, 0.02, 0.2)
-        glVertex3f(-0.2, 0.02, 0.2)
+        gl.glColor3f(1.0, 1.0, 0.0)  # Yellow
+        gl.glVertex3f(-0.2, 0.02, 0.0)
+        gl.glVertex3f(0.2, 0.02, 0.0)
+        gl.glVertex3f(0.2, 0.02, 0.2)
+        gl.glVertex3f(-0.2, 0.02, 0.2)
 
-        glColor3f(1.0, 0.5, 0.0)  # Orange
-        glVertex3f(-0.2, 0.02, 0.2)
-        glVertex3f(-0.2, 0.4, 0.2)
-        glVertex3f(-0.2, 0.4, 0.1)
-        glVertex3f(-0.2, 0.02, 0.0)
+        gl.glColor3f(1.0, 0.5, 0.0)  # Orange
+        gl.glVertex3f(-0.2, 0.02, 0.2)
+        gl.glVertex3f(-0.2, 0.4, 0.2)
+        gl.glVertex3f(-0.2, 0.4, 0.1)
+        gl.glVertex3f(-0.2, 0.02, 0.0)
 
-        glColor3f(1.0, 0.5, 0.0)  # Orange
-        glVertex3f(0.2, 0.02, 0.2)
-        glVertex3f(0.2, 0.4, 0.2)
-        glVertex3f(0.2, 0.4, 0.1)
-        glVertex3f(0.2, 0.02, 0.0)
+        gl.glColor3f(1.0, 0.5, 0.0)  # Orange
+        gl.glVertex3f(0.2, 0.02, 0.2)
+        gl.glVertex3f(0.2, 0.4, 0.2)
+        gl.glVertex3f(0.2, 0.4, 0.1)
+        gl.glVertex3f(0.2, 0.02, 0.0)
 
-        glColor3f(1.0, 0.0, 1.0)  # Magenta
-        glVertex3f(-0.2, 0.02, 0.0)
-        glVertex3f(-0.2, 0.4, 0.1)
-        glVertex3f(0.2, 0.4, 0.1)
-        glVertex3f(0.2, 0.02, 0.0)
+        gl.glColor3f(1.0, 0.0, 1.0)  # Magenta
+        gl.glVertex3f(-0.2, 0.02, 0.0)
+        gl.glVertex3f(-0.2, 0.4, 0.1)
+        gl.glVertex3f(0.2, 0.4, 0.1)
+        gl.glVertex3f(0.2, 0.02, 0.0)
 
-        glColor3f(0.0, 0.0, 1.0)  # Blue
-        glVertex3f(-0.2, 0.02, 0.2)
-        glVertex3f(-0.2, 0.4, 0.2)
-        glVertex3f(0.2, 0.4, 0.2)
-        glVertex3f(0.2, 0.02, 0.2)
+        gl.glColor3f(0.0, 0.0, 1.0)  # Blue
+        gl.glVertex3f(-0.2, 0.02, 0.2)
+        gl.glVertex3f(-0.2, 0.4, 0.2)
+        gl.glVertex3f(0.2, 0.4, 0.2)
+        gl.glVertex3f(0.2, 0.02, 0.2)
 
-        glColor3f(1.0, 0.0, 0.0)  # Red
-        glVertex3f(-0.2, 0.4, 0.2)
-        glVertex3f(-0.2, 0.4, 0.1)
-        glVertex3f(0.2, 0.4, 0.1)
-        glVertex3f(0.2, 0.4, 0.2)
+        gl.glColor3f(1.0, 0.0, 0.0)  # Red
+        gl.glVertex3f(-0.2, 0.4, 0.2)
+        gl.glVertex3f(-0.2, 0.4, 0.1)
+        gl.glVertex3f(0.2, 0.4, 0.1)
+        gl.glVertex3f(0.2, 0.4, 0.2)
 
-        glEnd()
+        gl.glEnd()
