@@ -39,7 +39,11 @@ def main():
     fps = 0
     ticks = pygame.time.get_ticks()
     sensor_data = SensorData()
-    p = Predict()
+    try:
+        predictor = Predict()
+    except Exception as exception:
+        print("Predictor failed:", exception.with_traceback)
+        predictor = None
     while True:
         if not args.demo:
             sensor_data = sensors.read() or sensor_data
@@ -70,8 +74,8 @@ def main():
 
         if sensor_data is not None:
             sim.sensor_data = sensor_data
-            if not args.demo:
-                sim.setPose(p.predict(sensor_data) or 0)
+            if not args.demo and predictor is not None:
+                sim.setPose(predictor.predict(sensor_data) or 0)
         sim.draw()
 
         pygame.display.flip()
