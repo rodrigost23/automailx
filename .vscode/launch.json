@@ -10,7 +10,6 @@
             "request": "launch",
             "program": "${workspaceFolder}/automailx.py",
             "args": [
-                "automailx.py",
                 "--demo"
             ],
             "console": "integratedTerminal"
@@ -21,7 +20,6 @@
             "request": "launch",
             "program": "${workspaceFolder}/automailx.py",
             "args": [
-                "automailx.py",
                 "--serial"
             ],
             "console": "integratedTerminal"
