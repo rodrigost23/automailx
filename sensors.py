@@ -308,8 +308,16 @@ class Sensors():
         self.ser.reset_output_buffer()
         line = self.ser.readline()
 
+        # serial data is in yaw/pitch/roll format
         if line[:3] == b'ypr' and line[-2:] == b'\r\n':
             angles = line.split(b'\t')[1:-2]
+        # serial data has quaternion data
+        elif line[:4] == b'quat' and line[-2:] == b'\r\n':
+            data = line.split(b'\t')
+            angles = data[1:5]
+            if data[5] == b'aworld':
+                #TODO: accel = data[6:9]
+                pass
 
         elif len(line) > 9 and line[0:2] == b'$\x02' and line[-2:] == b'\r\n':
             q = [0.0]*4
