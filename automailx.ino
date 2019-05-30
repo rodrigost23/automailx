@@ -162,9 +162,6 @@ void dmpDataReady() {
 // ===                      INITIAL SETUP                       ===
 // ================================================================
 
-unsigned long previousMillis = 0; // will store last time data was sent
-const long interval = 5;       // interval at which to send data (milliseconds)
-
 void setup() {
     // join I2C bus (I2Cdev library doesn't do this automatically)
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
@@ -249,14 +246,8 @@ void setup() {
 // ================================================================
 
 void loop() {
-    // check to see if it's time to send data
-    unsigned long currentMillis = millis();
-
     // if programming failed, don't try to do anything
-    if (!dmpReady || currentMillis - previousMillis < interval)
-        return;
-    // save the last time data was sent
-    previousMillis = currentMillis;
+    if (!dmpReady) return;
 
     // wait for MPU interrupt or extra packet(s) available
     while (!mpuInterrupt && fifoCount < packetSize) {
