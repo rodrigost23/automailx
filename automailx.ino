@@ -112,9 +112,12 @@ MPU6050 mpu;
 // is present in this case). Could be quite handy in some cases.
 //#define OUTPUT_READABLE_WORLDACCEL
 
+// readable quaternions + world acceleration
+#define OUTPUT_READABLE_QUATERNION_WORLDACCEL
+
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
-#define OUTPUT_TEAPOT
+//#define OUTPUT_TEAPOT
 
 
 
@@ -158,6 +161,9 @@ void dmpDataReady() {
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
+
+unsigned long previousMillis = 0; // will store last time data was sent
+const long interval = 5;       // interval at which to send data (milliseconds)
 
 void setup() {
     // join I2C bus (I2Cdev library doesn't do this automatically)
@@ -243,8 +249,14 @@ void setup() {
 // ================================================================
 
 void loop() {
+    // check to see if it's time to send data
+    unsigned long currentMillis = millis();
+
     // if programming failed, don't try to do anything
-    if (!dmpReady) return;
+    if (!dmpReady || currentMillis - previousMillis < interval)
+        return;
+    // save the last time data was sent
+    previousMillis = currentMillis;
 
     // wait for MPU interrupt or extra packet(s) available
     while (!mpuInterrupt && fifoCount < packetSize) {
@@ -345,6 +357,32 @@ void loop() {
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
             mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+            Serial.print("aworld\t");
+            Serial.print(aaWorld.x);
+            Serial.print("\t");
+            Serial.print(aaWorld.y);
+            Serial.print("\t");
+            Serial.println(aaWorld.z);
+        #endif
+
+        #ifdef OUTPUT_READABLE_QUATERNION_WORLDACCEL
+            // display quaternion values in easy matrix form: w x y z
+            mpu.dmpGetQuaternion(&q, fifoBuffer);
+            Serial.print("quat\t");
+            Serial.print(q.w);
+            Serial.print("\t");
+            Serial.print(q.x);
+            Serial.print("\t");
+            Serial.print(q.y);
+            Serial.print("\t");
+            Serial.print(q.z);
+            // display initial world-frame acceleration, adjusted to remove gravity
+            // and rotated based on known orientation from quaternion
+            mpu.dmpGetAccel(&aa, fifoBuffer);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+            mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+            Serial.print("\t");
             Serial.print("aworld\t");
             Serial.print(aaWorld.x);
             Serial.print("\t");
