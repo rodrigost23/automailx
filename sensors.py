@@ -257,8 +257,9 @@ class Sensors():
             pass
 
     def __readserial(self):
+        gw = gx = gy = gz = 0.0
         ax = ay = az = 0.0
-        angles = []
+        gyro = []
         accel = []
 
         # request data by sending a character
@@ -277,11 +278,11 @@ class Sensors():
 
         # serial data is in yaw/pitch/roll format
         if line[:3] == b'ypr' and line[-2:] == b'\r\n':
-            angles = line.split(b'\t')[1:-2]
+            gyro = line.split(b'\t')[1:-2]
         # serial data has quaternion data
         elif line[:4] == b'quat' and line[-2:] == b'\r\n':
             data = line.split(b'\t')
-            angles = data[1:5]
+            gyro = data[1:5]
             if data[5] == b'aworld':
                 accel = data[6:9]
 
@@ -295,16 +296,19 @@ class Sensors():
             for i, _ in enumerate(range(4)):
                 if (q[i] >= 2):
                     q[i] = -4 + q[i]
-            angles = q
+            gyro = q
 
-        if len(angles) == 4:
-            aw = float(angles[0])
-            ax = float(angles[1])
-            ay = float(angles[2])
-            az = float(angles[3])
-            self.data.setdata(gw=aw, gx=ax, gy=ay, gz=az)
+        if len(gyro) == 4:
+            gw = float(gyro[0])
+            gx = float(gyro[1])
+            gy = float(gyro[2])
+            gz = float(gyro[3])
+            self.data.setdata(gw=gw, gx=gx, gy=gy, gz=gz)
             if len(accel) == 3:
-                self.data.setdata()
+                ax = float(accel[0])
+                ay = float(accel[1])
+                az = float(accel[2])
+                self.data.setdata(ax=ax, ay=ay, az=az)
             return self.data
 
     def close(self):
