@@ -61,11 +61,11 @@ def main():
         else:
             keys = pygame.key.get_pressed()  # checking pressed keys
             if keys[pygame.K_RIGHT]:
-                sensor_data.angle = max(
-                    0.0, min(90.0, sensor_data.angle - 5))
+                sensor_data.flex = max(
+                    0.0, min(90.0, sensor_data.flex - 5))
             elif keys[pygame.K_LEFT]:
-                sensor_data.angle = max(
-                    0.0, min(90.0, sensor_data.angle + 5))
+                sensor_data.flex = max(
+                    0.0, min(90.0, sensor_data.flex + 5))
             elif args.demo:
                 if event.type == KEYDOWN and event.key == K_UP:
                     sim.nextPose()

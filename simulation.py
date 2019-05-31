@@ -88,10 +88,10 @@ class Simulation():
         """Draws one frame in the OpenGL window
         """
         sensor_data = self.sensor_data
-        quat = Quaternion(sensor_data.w, sensor_data.x,
-                          sensor_data.y, sensor_data.z)
-        offset = Quaternion(self.offset.w, self.offset.x,
-                            self.offset.y, self.offset.z)
+        quat = Quaternion(sensor_data.gyro.w, sensor_data.gyro.x,
+                          sensor_data.gyro.y, sensor_data.gyro.z)
+        offset = Quaternion(self.offset.gyro.w, self.offset.gyro.x,
+                            self.offset.gyro.y, self.offset.gyro.z)
         if offset:
             quat = quat * offset.inverse
 
@@ -100,9 +100,9 @@ class Simulation():
         gl.glLoadIdentity()
         gl.glTranslatef(0, 0.0, -7.0)
 
-        osd_line = "pitch: " + str("{0:.2f}".format(sensor_data.ay)) + \
-            ", roll: " + str("{0:.2f}".format(sensor_data.ax)) + \
-            ", yaw: " + str("{0:.2f}".format(sensor_data.az))
+        osd_line = "x: " + str("{0:.2f}".format(sensor_data.gyro_euler.x)) + \
+            ", y: " + str("{0:.2f}".format(sensor_data.gyro_euler.y)) + \
+            ", z: " + str("{0:.2f}".format(sensor_data.gyro_euler.z))
 
         self.drawText((-2, 1.9, 2), osd_line)
 
@@ -120,7 +120,7 @@ class Simulation():
 
         # Flex sensor:
         # Pitch, rotate around x-axis
-        gl.glRotatef(self.sensor_data.angle, 1.0, 0.0, 0.0)
+        gl.glRotatef(self.sensor_data.flex, 1.0, 0.0, 0.0)
 
         gl.glColor3f(0, 1, 0)
         glu.gluDisk(self.quad, 0, 0.15, 10, 1)

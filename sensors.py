@@ -6,8 +6,10 @@ import time
 from struct import unpack_from
 
 import serial
+from pyquaternion import Quaternion
 from serial import tools
 from serial.tools import list_ports
+
 
 def quat_to_euler(w, x, y, z):
     """Converts quaternion to euler angles
@@ -30,112 +32,46 @@ def quat_to_euler(w, x, y, z):
 class SensorData():
     """Stores sensor data including orientation and angle
     """
+    class Triple():
+        def __init__(self, x: float, y: float, z: float):
+            self.x = x
+            self.y = y
+            self.z = z
 
-    def __init__(self, w: float = 0.0, x: float = 0.0, y: float = 0.0, z: float = 0.0, angle: float = 0.0):
-        self.imu = [{
-            'w': w,
-            'x': x,
-            'y': y,
-            'z': z
-        }]
+    def __init__(self,
+                 gw: float = 0.0, gx: float = 0.0, gy: float = 0.0, gz: float = 0.0,
+                 ax: float = 0.0, ay: float = 0.0, az: float = 0.0,
+                 angle: float = 0.0):
 
-        self.flex = [angle]
+        self.gyro = Quaternion([gw, gx, gy, gz])
 
-    @property
-    def w(self):
-        """Gets w for the imu sensor
-        """
-        return self.imu[0]["w"]
+        self.accel = self.Triple(ax, ay, az)
 
-    @w.setter
-    def w(self, value):
-        """Sets w for the imu sensor
-        """
-        self.imu[0]["w"] = value
+        self.flex = angle
 
     @property
-    def x(self):
-        """Gets x for the imu sensor
+    def gyro_euler(self):
+        """Gets Euler angles for the gyro sensor
         """
-        return self.imu[0]["x"]
-
-    @x.setter
-    def x(self, value):
-        """Sets x for the imu sensor
-        """
-        self.imu[0]["x"] = value
-
-    @property
-    def y(self):
-        """Gets y for the imu sensor
-        """
-        return self.imu[0]["y"]
-
-    @y.setter
-    def y(self, value):
-        """Sets y for the imu sensor
-        """
-        self.imu[0]["y"] = value
-
-    @property
-    def z(self):
-        """Gets z for the imu sensor
-        """
-        return self.imu[0]["z"]
-
-    @z.setter
-    def z(self, value):
-        """Sets z for the imu sensor
-        """
-        self.imu[0]["z"] = value
-
-    @property
-    def angle(self):
-        """Gets angle for the flex sensor
-        """
-        return self.flex[0]
-
-    @angle.setter
-    def angle(self, value):
-        """Sets angle for the flex sensor
-        """
-        self.flex[0] = value
-
-    @property
-    def ax(self):
-        """Gets x angle
-        """
-        return quat_to_euler(self.w, self.x, self.y, self.z)[0]
-
-    @property
-    def ay(self):
-        """Gets y angle
-        """
-        return quat_to_euler(self.w, self.x, self.y, self.z)[1]
-
-    @property
-    def az(self):
-        """Gets z angle
-        """
-        return quat_to_euler(self.w, self.x, self.y, self.z)[2]
+        return self.Triple(*quat_to_euler(self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z))
 
     def __str__(self):
-        return "imu(%.1f,%.1f,%.1f,%.1f) flex(%.1f)" % (self.w, self.x, self.y, self.z, self.angle)
+        return "imu(%.1f,%.1f,%.1f,%.1f) flex(%.1f)" % (self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z, self.flex)
 
     def __len__(self):
         return 5
 
     def __getitem__(self, key):
         if key in ("w", 0):
-            return self.w
+            return self.gyro.w
         if key in ("x", 1):
-            return self.x
+            return self.gyro.x
         if key in ("y", 2):
-            return self.y
+            return self.gyro.y
         if key in ("z", 3):
-            return self.z
+            return self.gyro.z
         if key in ("angle", 4):
-            return self.angle
+            return self.flex
 
         if isinstance(key, int) and key >= self.__len__():
             raise IndexError()
@@ -144,37 +80,42 @@ class SensorData():
 
     def __setitem__(self, key, value):
         if key in ("w", 0):
-            self.w = value
+            self.gyro.w = value
         if key in ("x", 1):
-            self.x = value
+            self.gyro.x = value
         if key in ("y", 2):
-            self.y = value
+            self.gyro.y = value
         if key in ("z", 3):
-            self.z = value
+            self.gyro.z = value
         if key in ("angle", 4):
-            self.angle = value
+            self.flex = value
         else:
             raise KeyError()
 
     def __sub__(self, other):
         difference = SensorData(
-            self.w - other.w, self.x - other.x, self.y - other.y, self.z - other.z, self.angle - other.angle)
+            self.gyro.w - other.gyro.w,
+            self.gyro.x - other.gyro.x,
+            self.gyro.y - other.gyro.y,
+            self.gyro.z - other.gyro.z,
+            self.flex - other.flex
+            )
+
         return difference
 
     def data(self):
-        yield self.w
-        yield self.x
-        yield self.y
-        yield self.z
-        yield self.angle
+        yield self.gyro.w
+        yield self.gyro.x
+        yield self.gyro.y
+        yield self.gyro.z
+        yield self.flex
 
-    def setdata(self, w: float = None, x: float = None, y: float = None, z: float = None, angle: float = None):
-        self.w = w or self.w
-        self.x = x or self.x
-        self.y = y or self.y
-        self.z = z or self.z
-        self.angle = angle or self.angle
-
+    def setdata(self, w: float = None, x: float = None, y: float = None, z: float = None, flex: float = None):
+        self.gyro[0] = w or self.gyro.w
+        self.gyro[1] = x or self.gyro.x
+        self.gyro[2] = y or self.gyro.y
+        self.gyro[3] = z or self.gyro.z
+        self.flex = flex or self.flex
 
 class Sensors():
     """Reads sensor data from UDP or serial ports
