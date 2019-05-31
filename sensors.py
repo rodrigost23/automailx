@@ -59,18 +59,24 @@ class SensorData():
         return "imu(%.1f,%.1f,%.1f,%.1f) flex(%.1f)" % (self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z, self.flex)
 
     def __len__(self):
-        return 5
+        return 8
 
     def __getitem__(self, key):
-        if key in ("w", 0):
+        if key in ("gw", 0):
             return self.gyro.w
-        if key in ("x", 1):
+        if key in ("gx", 1):
             return self.gyro.x
-        if key in ("y", 2):
+        if key in ("gy", 2):
             return self.gyro.y
-        if key in ("z", 3):
+        if key in ("gz", 3):
             return self.gyro.z
-        if key in ("angle", 4):
+        if key in ("ax", 4):
+            return self.gyro.x
+        if key in ("ay", 5):
+            return self.gyro.y
+        if key in ("az", 6):
+            return self.gyro.z
+        if key in ("flex", 7):
             return self.flex
 
         if isinstance(key, int) and key >= self.__len__():
@@ -79,15 +85,21 @@ class SensorData():
             raise KeyError(key)
 
     def __setitem__(self, key, value):
-        if key in ("w", 0):
+        if key in ("gw", 0):
             self.gyro.w = value
-        if key in ("x", 1):
+        if key in ("gx", 1):
             self.gyro.x = value
-        if key in ("y", 2):
+        if key in ("gy", 2):
             self.gyro.y = value
-        if key in ("z", 3):
+        if key in ("gz", 3):
             self.gyro.z = value
-        if key in ("angle", 4):
+        if key in ("ax", 4):
+            self.gyro.z = value
+        if key in ("ay", 5):
+            self.gyro.z = value
+        if key in ("az", 6):
+            self.gyro.z = value
+        if key in ("flex", 7):
             self.flex = value
         else:
             raise KeyError()
@@ -98,6 +110,9 @@ class SensorData():
             self.gyro.x - other.gyro.x,
             self.gyro.y - other.gyro.y,
             self.gyro.z - other.gyro.z,
+            self.accel.x - other.accel.x,
+            self.accel.y - other.accel.y,
+            self.accel.z - other.accel.z,
             self.flex - other.flex
             )
 
@@ -108,13 +123,23 @@ class SensorData():
         yield self.gyro.x
         yield self.gyro.y
         yield self.gyro.z
+        yield self.accel.x
+        yield self.accel.y
+        yield self.accel.z
         yield self.flex
 
-    def setdata(self, w: float = None, x: float = None, y: float = None, z: float = None, flex: float = None):
-        self.gyro[0] = w or self.gyro.w
-        self.gyro[1] = x or self.gyro.x
-        self.gyro[2] = y or self.gyro.y
-        self.gyro[3] = z or self.gyro.z
+    def setdata(self,
+                gw: float = None, gx: float = None, gy: float = None, gz: float = None,
+                ax: float = None, ay: float = None, az: float = None,
+                flex: float = None
+                ):
+        self.gyro[0] = gw or self.gyro.w
+        self.gyro[1] = gx or self.gyro.x
+        self.gyro[2] = gy or self.gyro.y
+        self.gyro[3] = gz or self.gyro.z
+        self.accel.x = ax or self.accel.x
+        self.accel.y = ay or self.accel.y
+        self.accel.z = az or self.accel.z
         self.flex = flex or self.flex
 
 class Sensors():
@@ -234,6 +259,7 @@ class Sensors():
     def __readserial(self):
         ax = ay = az = 0.0
         angles = []
+        accel = []
 
         # request data by sending a character
         millis = int(round(time.time() * 1000))
@@ -257,8 +283,7 @@ class Sensors():
             data = line.split(b'\t')
             angles = data[1:5]
             if data[5] == b'aworld':
-                #TODO: accel = data[6:9]
-                pass
+                accel = data[6:9]
 
         elif len(line) > 9 and line[0:2] == b'$\x02' and line[-2:] == b'\r\n':
             q = [0.0]*4
@@ -277,7 +302,9 @@ class Sensors():
             ax = float(angles[1])
             ay = float(angles[2])
             az = float(angles[3])
-            self.data.setdata(aw, ax, ay, az)
+            self.data.setdata(gw=aw, gx=ax, gy=ay, gz=az)
+            if len(accel) == 3:
+                self.data.setdata()
             return self.data
 
     def close(self):

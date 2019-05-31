@@ -11,8 +11,8 @@ from sensors import SensorData
 class Simulation():
     """Shows a 3D simulation of a leg prosthesis
     """
-    sensor_data = SensorData(0.0, 0.0, 0.0, 0.0)
-    offset = SensorData(0.0, 0.0, 0.0, 0.0)
+    sensor_data = SensorData()
+    offset = SensorData()
     pose = 0
     __num_poses = 2
 
