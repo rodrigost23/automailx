@@ -61,11 +61,11 @@ def main():
         while data is None:
             data = s.read()
 
-        save_data = sensors.SensorData(*data.data())
+        save_data = list(data.data())
         with open(filename, "a", newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
-            csv_writer.writerow([activity] + list(save_data.data()))
-        print("    Saved %s      " % (save_data), end='\n\n')
+            csv_writer.writerow([activity] + save_data)
+        print("    Saved %s      " % save_data, end='\n\n')
     print("Finished.")
 
 
