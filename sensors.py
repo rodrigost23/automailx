@@ -56,7 +56,8 @@ class SensorData():
         return self.Triple(*quat_to_euler(self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z))
 
     def __str__(self):
-        return "imu(%.1f,%.1f,%.1f,%.1f) flex(%.1f)" % (self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z, self.flex)
+        return "gyro(%4.1f,%4.1f,%4.1f,%4.1f) accel(%7.1f,%7.1f,%7.1f) flex(%4.1f)" % \
+            (self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z, self.accel.x, self.accel.y, self.accel.z, self.flex)
 
     def __len__(self):
         return 8
@@ -119,13 +120,14 @@ class SensorData():
         return difference
 
     def data(self):
-        yield self.gyro.w
-        yield self.gyro.x
-        yield self.gyro.y
-        yield self.gyro.z
+        """Generator of data to be used in the classifier"""
+        # yield self.gyro.w
+        # yield self.gyro.x
+        # yield self.gyro.y
+        # yield self.gyro.z
         yield self.accel.x
         yield self.accel.y
-        yield self.accel.z
+        # yield self.accel.z
         yield self.flex
 
     def setdata(self,
