@@ -121,13 +121,13 @@ class SensorData():
 
     def data(self):
         """Generator of data to be used in the classifier"""
-        # yield self.gyro.w
-        # yield self.gyro.x
-        # yield self.gyro.y
-        # yield self.gyro.z
+        yield self.gyro.w
+        yield self.gyro.x
+        yield self.gyro.y
+        yield self.gyro.z
         yield self.accel.x
         yield self.accel.y
-        # yield self.accel.z
+        yield self.accel.z
         yield self.flex
 
     def setdata(self,
