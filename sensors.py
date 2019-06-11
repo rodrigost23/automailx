@@ -287,6 +287,8 @@ class Sensors():
             gyro = data[1:5]
             if data[5] == b'aworld':
                 accel = data[6:9]
+            if data[9] == b'flex':
+                self.data.setdata(flex=float(data[10]))
 
         elif len(line) > 9 and line[0:2] == b'$\x02' and line[-2:] == b'\r\n':
             q = [0.0]*4
