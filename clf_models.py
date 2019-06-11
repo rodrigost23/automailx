@@ -1,4 +1,5 @@
 import os
+import time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,7 +19,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 # from sklearn.metrics import explained_variance_score, make_scorer
 
-seed = 100
+seed = int(round(time.time() * 1000))
 
 X = []
 Y = []
@@ -56,7 +57,7 @@ random_state=100)
 results = []
 names = []
 cv_means = []
-kfold = model_selection.KFold(n_splits=10, random_state=seed)
+kfold = model_selection.KFold(n_splits=int(0.8 * len(X)), random_state=seed)
 scoring = 'accuracy'
 for name, model in models:
     cv_results = model_selection.cross_val_score(model, X, Y,
