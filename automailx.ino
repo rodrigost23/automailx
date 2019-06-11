@@ -1,22 +1,3 @@
-// I2C device class (I2Cdev) demonstration Arduino sketch for MPU6050 class using DMP (MotionApps v2.0)
-// 6/21/2012 by Jeff Rowberg <jeff@rowberg.net>
-// Updates should (hopefully) always be available at https://github.com/jrowberg/i2cdevlib
-//
-// Changelog:
-//      2013-05-08 - added seamless Fastwire support
-//                 - added note about gyro calibration
-//      2012-06-21 - added note about Arduino 1.0.1 + Leonardo compatibility error
-//      2012-06-20 - improved FIFO overflow handling and simplified read process
-//      2012-06-19 - completely rearranged DMP initialization code and simplification
-//      2012-06-13 - pull gyro and accel data from FIFO packet instead of reading directly
-//      2012-06-09 - fix broken FIFO read sequence and change interrupt detection to RISING
-//      2012-06-05 - add gravity-compensated initial reference frame acceleration output
-//                 - add 3D math helper file to DMP6 example sketch
-//                 - add Euler output and Yaw/Pitch/Roll output formats
-//      2012-06-04 - remove accel offset clearing for better results (thanks Sungon Lee)
-//      2012-06-01 - fixed gyro sensitivity to be 2000 deg/sec instead of 250
-//      2012-05-30 - basic DMP initialization working
-
 /* ============================================
 I2Cdev device library code is placed under the MIT license
 Copyright (c) 2012 Jeff Rowberg
@@ -80,6 +61,26 @@ MPU6050 mpu;
  * ========================================================================= */
 
 
+// ================================================================
+// ===                  FLEX SENSOR CONSTANTS                   ===
+// ================================================================
+
+const int FLEX_PIN = A0; // Pin connected to voltage divider output
+
+// Measure the voltage at 5V and the actual resistance of your
+// 47k resistor, and enter them below:
+const float VCC = 4.98; // Measured voltage of Ardunio 5V line
+const float R_DIV = 47500.0; // Measured resistance of 3.3k resistor
+
+// Upload the code, then try to adjust these values to more
+// accurately calculate bend degree.
+const float STRAIGHT_RESISTANCE = 31200.0; // resistance when straight
+const float BEND_RESISTANCE = 60000.0; // resistance at 90 deg
+
+
+// ================================================================
+// ===                       MPU CONSTANTS                      ===
+// ================================================================
 
 // uncomment "OUTPUT_READABLE_QUATERNION" if you want to see the actual
 // quaternion components in a [w, x, y, z] format (not best for parsing
@@ -113,7 +114,7 @@ MPU6050 mpu;
 //#define OUTPUT_READABLE_WORLDACCEL
 
 // readable quaternions + world acceleration
-#define OUTPUT_READABLE_QUATERNION_WORLDACCEL
+#define OUTPUT_AUTOMAIL_X
 
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
@@ -187,6 +188,7 @@ void setup() {
     Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
     pinMode(INTERRUPT_PIN, INPUT);
+    pinMode(FLEX_PIN, INPUT);
 
     // verify connection
     Serial.println(F("Testing device connections..."));
@@ -356,8 +358,9 @@ void loop() {
             Serial.println(aaWorld.z);
         #endif
 
-        #ifdef OUTPUT_READABLE_QUATERNION_WORLDACCEL
-            // display quaternion values in easy matrix form: w x y z
+        #ifdef OUTPUT_AUTOMAIL_X
+            // display quaternion values in easy matrix form: w x y z,
+            // plus accelerometer x y z and flex sensor angle
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             Serial.print("quat\t");
             Serial.print(q.w);
@@ -367,6 +370,7 @@ void loop() {
             Serial.print(q.y);
             Serial.print("\t");
             Serial.print(q.z);
+            
             // display initial world-frame acceleration, adjusted to remove gravity
             // and rotated based on known orientation from quaternion
             mpu.dmpGetAccel(&aa, fifoBuffer);
@@ -379,7 +383,21 @@ void loop() {
             Serial.print("\t");
             Serial.print(aaWorld.y);
             Serial.print("\t");
-            Serial.println(aaWorld.z);
+            Serial.print(aaWorld.z);
+            
+            // Read the ADC, and calculate voltage and resistance from it
+            int flexADC = analogRead(FLEX_PIN);
+            float flexV = flexADC * VCC / 1023.0;
+            float flexR = R_DIV * (VCC / flexV - 1.0);
+            //Serial.print("Resistance: " + String(flexR) + " ohms");
+          
+            // Use the calculated resistance to estimate the sensor's
+            // bend angle:
+            float angle = map(flexR, STRAIGHT_RESISTANCE, BEND_RESISTANCE,
+                             0, 90.0);
+            Serial.print("\t");
+            Serial.print("flex\t");
+            Serial.println(angle);
         #endif
     
         #ifdef OUTPUT_TEAPOT
