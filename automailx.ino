@@ -393,11 +393,11 @@ void loop() {
           
             // Use the calculated resistance to estimate the sensor's
             // bend angle:
-            float angle = map(flexR, STRAIGHT_RESISTANCE, BEND_RESISTANCE,
-                             0, 90.0);
+            //float angle = map(flexR, STRAIGHT_RESISTANCE, BEND_RESISTANCE,
+            //                 0, 90.0);
             Serial.print("\t");
             Serial.print("flex\t");
-            Serial.println(angle);
+            Serial.println(flexR);
         #endif
     
         #ifdef OUTPUT_TEAPOT
