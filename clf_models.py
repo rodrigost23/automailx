@@ -41,10 +41,10 @@ models.append(('LDA', LinearDiscriminantAnalysis()))
 models.append(('KNN', KNeighborsClassifier()))
 models.append(('CART', DecisionTreeClassifier()))
 models.append(('NB', GaussianNB()))
-models.append(('SVM', SVC()))
+models.append(('SVM', SVC(gamma='scale')))
 models.append(('ADB', AdaBoostClassifier()))
-models.append(('RFC', RandomForestClassifier()))
-models.append(('ETC', ExtraTreesClassifier()))
+models.append(('RFC', RandomForestClassifier(n_estimators=100)))
+models.append(('ETC', ExtraTreesClassifier(n_estimators=100)))
 models.append(('GBC', GradientBoostingClassifier()))
 
 """
