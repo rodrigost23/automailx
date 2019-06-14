@@ -15,6 +15,20 @@ class Simulation():
     offset = SensorData()
     pose = 0
     __num_poses = 2
+    flex_bent = 29000.0
+    flex_straight = 64000.0
+
+    def translate_range(self, value, leftMin, leftMax, rightMin, rightMax):
+        """Translates one range to another"""
+        # Figure out how 'wide' each range is
+        leftSpan = leftMax - leftMin
+        rightSpan = rightMax - rightMin
+
+        # Convert the left range into a 0-1 range (float)
+        valueScaled = float(value - leftMin) / float(leftSpan)
+
+        # Convert the 0-1 range into a value in the right range.
+        return rightMin + (valueScaled * rightSpan)
 
     def resize(self, width, height):
         if height == 0:
@@ -88,6 +102,7 @@ class Simulation():
         """Draws one frame in the OpenGL window
         """
         sensor_data = self.sensor_data
+        print("\r%s" % sensor_data, end='')
         quat = Quaternion(sensor_data.gyro.w, sensor_data.gyro.x,
                           sensor_data.gyro.y, sensor_data.gyro.z)
         offset = Quaternion(self.offset.gyro.w, self.offset.gyro.x,
@@ -95,14 +110,18 @@ class Simulation():
         if offset:
             quat = quat * offset.inverse
 
+        angle = self.translate_range(
+            self.sensor_data.flex, self.flex_straight, self.flex_bent, 0.0, 90.0)
+
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 
         gl.glLoadIdentity()
         gl.glTranslatef(0, 0.0, -7.0)
 
-        osd_line = "x: " + str("{0:.2f}".format(sensor_data.gyro_euler.x)) + \
-            ", y: " + str("{0:.2f}".format(sensor_data.gyro_euler.y)) + \
-            ", z: " + str("{0:.2f}".format(sensor_data.gyro_euler.z))
+        osd_line = "x: " + "{0:.2f}".format(sensor_data.gyro_euler.x) + \
+            ", y: " + "{0:.2f}".format(sensor_data.gyro_euler.y) + \
+            ", z: " + "{0:.2f}".format(sensor_data.gyro_euler.z) + \
+            ", flex: " + "{0:.2f}°".format(angle)
 
         self.drawText((-2, 1.9, 2), osd_line)
 
@@ -120,7 +139,7 @@ class Simulation():
 
         # Flex sensor:
         # Pitch, rotate around x-axis
-        gl.glRotatef(self.sensor_data.flex, 1.0, 0.0, 0.0)
+        gl.glRotatef(angle, 1.0, 0.0, 0.0)
 
         gl.glColor3f(0, 1, 0)
         glu.gluDisk(self.quad, 0, 0.15, 10, 1)
