@@ -56,7 +56,7 @@ class SensorData():
         return self.Triple(*quat_to_euler(self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z))
 
     def __str__(self):
-        return "gyro(%4.1f,%4.1f,%4.1f,%4.1f) accel(%7.1f,%7.1f,%7.1f) flex(%4.1f)" % \
+        return "gyro(%4.1f,%4.1f,%4.1f,%4.1f) accel(%8.1f,%8.1f,%8.1f) flex(%8.1f)" % \
             (self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z, self.accel.x, self.accel.y, self.accel.z, self.flex)
 
     def __len__(self):
@@ -121,10 +121,10 @@ class SensorData():
 
     def data(self):
         """Generator of data to be used in the classifier"""
-        yield self.gyro.w
-        yield self.gyro.x
-        yield self.gyro.y
-        yield self.gyro.z
+        # yield self.gyro.w
+        # yield self.gyro.x
+        # yield self.gyro.y
+        # yield self.gyro.z
         yield self.accel.x
         yield self.accel.y
         yield self.accel.z
@@ -269,7 +269,10 @@ class Sensors():
         if (millis - self.__interval > 1000):
             # resend single character to trigger DMP init/start
             # in case the MPU is halted/reset while applet is running
-            self.ser.write(b'r')
+            try:
+                self.ser.write(b'r')
+            except SerialException:
+                print("\nFail to write to serial")
             __interval = millis
 
         # while not line_done:
