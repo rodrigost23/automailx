@@ -32,13 +32,14 @@ def main():
     pygame.init()
     pygame.display.set_mode((900, 500), video_flags)
 
-    title = "Press Esc to quit"
+    title = "AutomailX"
     pygame.display.set_caption(title)
     sim = Simulation(900, 500)
     frames = 0
     fps = 0
     ticks = pygame.time.get_ticks()
     sensor_data = SensorData()
+    prediction = None
     try:
         predictor = Predict()
     except Exception as exception:
@@ -75,7 +76,9 @@ def main():
         if sensor_data is not None:
             sim.sensor_data = sensor_data
             if not args.demo and predictor is not None:
-                sim.setPose(predictor.predict(sensor_data) or 0)
+                prediction = predictor.predict(sensor_data) or 0
+                sim.setPose(prediction)
+                print(" Prediction: %s   " % prediction, end='')
         sim.draw()
 
         pygame.display.flip()
@@ -84,11 +87,11 @@ def main():
             fps = ((frames*1000)//(pygame.time.get_ticks()-ticks))
             ticks = pygame.time.get_ticks()
             frames = 0
-        pygame.display.set_caption(title + " | FPS: %d" % fps)
+        prediction_title = ("| Prediction: %d" % prediction) if prediction is not None else ""
+        pygame.display.set_caption("%s | FPS: %3d %s" % (title, fps, prediction_title))
 
         frames = frames+1
 
-    print("fps:  %d" % fps)
     if not args.demo:
         sensors.close()
 

@@ -68,16 +68,16 @@ class Predict():
 def main():
     p = Predict()
     s = sensors.Sensors()
+    data = None
     try:
         while True:
-            data = s.read()
+            data = s.read() or data
             y_pred = p.predict(data)
+            print("\r%s" % data, end='')
             if y_pred is None:
-                continue
-
-            print("        Prediction: %s" % (y_pred) + " " * 5, end='')
-
-        print("\r[%ds] " % (p.elapsed_time), end='')
+                print(" " * 25, end='')
+            else:
+                print("  Prediction: %s" % (y_pred) + " " * 5, end='')
 
     except KeyboardInterrupt:
         print("Interrupted." + " " * 36)
