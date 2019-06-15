@@ -53,13 +53,8 @@ class Predict():
             self.start_time = time.time()
         self.elapsed_time = time.time() - self.start_time
 
-        print("\r", end='')
-        if self.elapsed_time is not None and self.start_time is not None:
-            print("[%ds] " % (self.elapsed_time), end='')
-
-        print(str(data) + " " * 5, end='')
         self.dq.append(
-            {'time': self.elapsed_time, 'data': sensors.SensorData(*data.data())})
+            {'time': self.elapsed_time, 'data': sensors.SensorData(*data.clf_data())})
         # if time more than 1 second
         if self.dq and self.elapsed_time - self.dq[0]['time'] >= 1:
             save_data = data - self.dq.popleft()['data']
@@ -68,7 +63,7 @@ class Predict():
             #                                 sep=',',
             #                                 header=None)
 
-            return self.clf.predict(np.asarray([(list(save_data.data()))]))
+            return self.clf.predict(np.asarray([(list(save_data.clf_data()))]))
 
 def main():
     p = Predict()

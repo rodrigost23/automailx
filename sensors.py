@@ -42,11 +42,8 @@ class SensorData():
                  gw: float = 0.0, gx: float = 0.0, gy: float = 0.0, gz: float = 0.0,
                  ax: float = 0.0, ay: float = 0.0, az: float = 0.0,
                  angle: float = 0.0):
-
         self.gyro = Quaternion([gw, gx, gy, gz])
-
         self.accel = self.Triple(ax, ay, az)
-
         self.flex = angle
 
     @property
@@ -119,7 +116,7 @@ class SensorData():
 
         return difference
 
-    def data(self):
+    def clf_data(self):
         """Generator of data to be used in the classifier"""
         # yield self.gyro.w
         # yield self.gyro.x
