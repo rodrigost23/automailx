@@ -1,5 +1,7 @@
 """Shows a 3D simulation of a leg prosthesis
 """
+import copy
+
 import OpenGL.GL as gl
 import OpenGL.GLU as glu
 import pygame
@@ -74,7 +76,6 @@ class Simulation():
         Arguments:
             pose {int} -- The pose number
         """
-        print("set pose %d" % pose)
         self.pose = pose
 
     def recenter(self, data: SensorData = None):
@@ -87,7 +88,7 @@ class Simulation():
         if data is None:
             data = self.sensor_data
 
-        self.offset = SensorData(*data.data())
+        self.offset = copy.deepcopy(data)
 
     def drawText(self, position, textString):
         font = pygame.font.SysFont("Courier", 18, True)
