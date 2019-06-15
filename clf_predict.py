@@ -7,7 +7,10 @@ from collections import deque
 import numpy as np
 import pandas as pd
 from sklearn import model_selection
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 import sensors
 
@@ -18,7 +21,7 @@ class Predict():
     elapsed_time = None
     dq = deque()
     # classifier
-    clf = DecisionTreeClassifier()
+    clf = LinearDiscriminantAnalysis()
 
     def __init__(self):
 
