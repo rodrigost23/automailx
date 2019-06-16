@@ -204,11 +204,15 @@ void setup() {
     Serial.println(F("Initializing DMP..."));
     devStatus = mpu.dmpInitialize();
 
-    // supply your own gyro offsets here, scaled for min sensitivity
-    mpu.setXGyroOffset(220);
-    mpu.setYGyroOffset(76);
-    mpu.setZGyroOffset(-85);
-    mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
+    // custom offsets
+    mpu.setXGyroOffset(247);
+    mpu.setYGyroOffset(-49);
+    mpu.setZGyroOffset(19);
+    // accelerometer offsets are disabled because dataset was generated without them
+    // mpu.setXAccelOffset(-3612);
+    // mpu.setYAccelOffset(-282);
+    // mpu.setZAccelOffset(704);
+    // mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
@@ -359,8 +363,7 @@ void loop() {
         #endif
 
         #ifdef OUTPUT_AUTOMAIL_X
-            // display quaternion values in easy matrix form: w x y z,
-            // plus accelerometer x y z and flex sensor angle
+            // display quaternion values in easy matrix form: w x y z
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             Serial.print("quat\t");
             Serial.print(q.w);
@@ -384,7 +387,8 @@ void loop() {
             Serial.print(aaWorld.y);
             Serial.print("\t");
             Serial.print(aaWorld.z);
-            
+
+            // plus accelerometer x y z and flex sensor angle
             // Read the ADC, and calculate voltage and resistance from it
             int flexADC = analogRead(FLEX_PIN);
             float flexV = flexADC * VCC / 1023.0;
