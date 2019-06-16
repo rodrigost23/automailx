@@ -8,6 +8,7 @@ import pygame
 from pyquaternion import Quaternion
 
 from sensors import SensorData
+from sensors import quat_to_euler
 
 
 class Simulation():
@@ -110,8 +111,11 @@ class Simulation():
                             self.offset.gyro.y, self.offset.gyro.z)
         if offset:
             quat = quat * offset.inverse
+            self.flex_bent = self.offset.flex - self.flex_straight + self.flex_bent
+            self.flex_straight = self.offset.flex
 
-        angle = self.translate_range(
+        gyro_euler = quat_to_euler(quat)
+        flex_angle = self.translate_range(
             self.sensor_data.flex, self.flex_straight, self.flex_bent, 0.0, 90.0)
 
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
@@ -119,16 +123,21 @@ class Simulation():
         gl.glLoadIdentity()
         gl.glTranslatef(0, 0.0, -7.0)
 
-        osd_line = "x: " + "{0:.2f}".format(sensor_data.gyro_euler.x) + \
-            ", y: " + "{0:.2f}".format(sensor_data.gyro_euler.y) + \
-            ", z: " + "{0:.2f}".format(sensor_data.gyro_euler.z) + \
-            ", flex: " + "{0:.2f}°".format(angle)
+        osd_line = \
+            "x: {0:<7.2f}".format(gyro_euler.x) + \
+            "y: {0:<7.2f}".format(gyro_euler.y) + \
+            "z: {0:<7.2f}".format(gyro_euler.z) + \
+            "flex: {0:>8}".format("{0:.2f}°".format(flex_angle))
 
         self.drawText((-2, 1.9, 2), osd_line)
 
         gl.glTranslatef(0, 2.0, 0.0)
+        # gl.glRotatef(quat.degrees, quat.x, quat.y, quat.z)
+        # gl.glRotatef(-quat.degrees*2, 1, 0, 0)
+        gl.glRotatef(-gyro_euler.x, 1, 0, 0)
+        gl.glRotatef(-gyro_euler.y, 0, 1, 0)
+        gl.glRotatef(gyro_euler.z*2, 0, 0, 1)
         gl.glRotatef(120, .5, .5, -.5)
-        gl.glRotatef(quat.degrees, -quat.x, quat.z, quat.y)
 
         gl.glColor3f(1, 0, 1)
         glu.gluDisk(self.quad, 0, 0.2, 10, 1)
@@ -140,7 +149,7 @@ class Simulation():
 
         # Flex sensor:
         # Pitch, rotate around x-axis
-        gl.glRotatef(angle, 1.0, 0.0, 0.0)
+        gl.glRotatef(flex_angle, 1.0, 0.0, 0.0)
 
         gl.glColor3f(0, 1, 0)
         glu.gluDisk(self.quad, 0, 0.15, 10, 1)
