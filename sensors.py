@@ -8,6 +8,7 @@ from struct import unpack_from
 import serial
 from pyquaternion import Quaternion
 from serial import tools
+from serial.serialutil import SerialException
 from serial.tools import list_ports
 
 
@@ -152,7 +153,7 @@ class SensorData():
             self.accel.y - other.accel.y,
             self.accel.z - other.accel.z,
             self.flex - other.flex
-            )
+        )
 
         return difference
 
@@ -180,6 +181,7 @@ class SensorData():
         self.accel.y = ay or self.accel.y
         self.accel.z = az or self.accel.z
         self.flex = flex or self.flex
+
 
 class Sensors():
     """Reads sensor data from UDP or serial ports
