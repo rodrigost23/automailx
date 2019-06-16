@@ -11,23 +11,46 @@ from serial import tools
 from serial.tools import list_ports
 
 
-def quat_to_euler(w, x, y, z):
+def quat_to_euler(*args):
     """Converts quaternion to euler angles
     """
-    t_0 = +2.0 * (w * x + y * z)
-    t_1 = +1.0 - 2.0 * (x * x + y * y)
-    a_x = math.degrees(math.atan2(t_0, t_1))
+    if len(args) == 4 and all(map(lambda x: isinstance(x, float), args)):
+        w = args[0]
+        x = args[1]
+        y = args[2]
+        z = args[3]
 
-    t_2 = +2.0 * (w * y - z * x)
-    t_2 = +1.0 if t_2 > +1.0 else t_2
-    t_2 = -1.0 if t_2 < -1.0 else t_2
-    a_y = math.degrees(math.asin(t_2))
+    elif len(args) == 1 and isinstance(args[0], Quaternion):
+        w = args[0].w
+        x = args[0].x
+        y = args[0].y
+        z = args[0].z
 
-    t_3 = +2.0 * (w * z + x * y)
-    t_4 = +1.0 - 2.0 * (y * y + z * z)
-    a_z = math.degrees(math.atan2(t_3, t_4))
+    else:
+        raise TypeError(
+            "Use either 4 floats (w, x, y, z) or one Quaternion object.")
 
-    return (a_x, a_y, a_z)
+    # roll(x-axis rotation)
+    sinr_cosp = +2.0 * (w * x + y * z)
+    cosr_cosp = +1.0 - 2.0 * (x * x + y * y)
+    roll = math.atan2(sinr_cosp, cosr_cosp)
+
+    # pitch(y-axis rotation)
+    sinp = +2.0 * (w * y - z * x)
+    if math.fabs(sinp) >= 1:
+        pitch = math.copysign(math.pi / 2, sinp)
+        # use 90 degrees if out of range
+    else:
+        pitch = math.asin(sinp)
+
+    # yaw(z-axis rotation)
+    siny_cosp = +2.0 * (w * z + x * y)
+    cosy_cosp = +1.0 - 2.0 * (y * y + z * z)
+    yaw = math.atan2(siny_cosp, cosy_cosp)
+
+    pitch, yaw, roll = map(math.degrees, (pitch, roll, yaw))
+
+    return SensorData.Triple(pitch, roll, yaw)
 
 class SensorData():
     """Stores sensor data including orientation and angle
@@ -37,6 +60,22 @@ class SensorData():
             self.x = x
             self.y = y
             self.z = z
+
+        def __len__(self):
+            return 3
+
+        def __getitem__(self, key):
+            if key in ("x", 0):
+                return self.x
+            if key in ("y", 1):
+                return self.y
+            if key in ("z", 2):
+                return self.z
+
+            if isinstance(key, int) and key >= self.__len__():
+                raise IndexError()
+            else:
+                raise KeyError(key)
 
     def __init__(self,
                  gw: float = 0.0, gx: float = 0.0, gy: float = 0.0, gz: float = 0.0,
@@ -50,11 +89,12 @@ class SensorData():
     def gyro_euler(self):
         """Gets Euler angles for the gyro sensor
         """
-        return self.Triple(*quat_to_euler(self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z))
+        return quat_to_euler(self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z)
 
     def __str__(self):
-        return "gyro(%4.1f,%4.1f,%4.1f,%4.1f) accel(%8.1f,%8.1f,%8.1f) flex(%8.1f)" % \
-            (self.gyro.w, self.gyro.x, self.gyro.y, self.gyro.z, self.accel.x, self.accel.y, self.accel.z, self.flex)
+        return "gyro(%4.1f,%4.1f,%4.1f) accel(%8.1f,%8.1f,%8.1f) flex(%8.1f)" % \
+            (self.gyro_euler.x, self.gyro_euler.y, self.gyro_euler.z,
+             self.accel.x, self.accel.y, self.accel.z, self.flex)
 
     def __len__(self):
         return 8
