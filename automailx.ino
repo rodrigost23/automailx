@@ -208,10 +208,9 @@ void setup() {
     mpu.setXGyroOffset(247);
     mpu.setYGyroOffset(-49);
     mpu.setZGyroOffset(19);
-    // accelerometer offsets are disabled because dataset was generated without them
-    // mpu.setXAccelOffset(-3612);
-    // mpu.setYAccelOffset(-282);
-    // mpu.setZAccelOffset(704);
+    mpu.setXAccelOffset(-3612);
+    mpu.setYAccelOffset(-282);
+    mpu.setZAccelOffset(704);
     // mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     // make sure it worked (returns 0 if so)
@@ -363,21 +362,29 @@ void loop() {
         #endif
 
         #ifdef OUTPUT_AUTOMAIL_X
+            //TODO: Change back to quaternion
             // display quaternion values in easy matrix form: w x y z
             mpu.dmpGetQuaternion(&q, fifoBuffer);
-            Serial.print("quat\t");
-            Serial.print(q.w);
+            mpu.dmpGetGravity(&gravity, &q);
+            mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+            Serial.print("ypr\t");
+            Serial.print(ypr[0] * 180 / M_PI);
             Serial.print("\t");
-            Serial.print(q.x);
+            Serial.print(ypr[1] * 180 / M_PI);
             Serial.print("\t");
-            Serial.print(q.y);
-            Serial.print("\t");
-            Serial.print(q.z);
+            Serial.print(ypr[2] * 180 / M_PI);
+            // Serial.print("quat\t");
+            // Serial.print(q.w);
+            // Serial.print("\t");
+            // Serial.print(q.x);
+            // Serial.print("\t");
+            // Serial.print(q.y);
+            // Serial.print("\t");
+            // Serial.print(q.z);
             
             // display initial world-frame acceleration, adjusted to remove gravity
             // and rotated based on known orientation from quaternion
             mpu.dmpGetAccel(&aa, fifoBuffer);
-            mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
             mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
             Serial.print("\t");

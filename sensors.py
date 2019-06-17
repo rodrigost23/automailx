@@ -321,11 +321,15 @@ class Sensors():
         line = self.ser.readline()
 
         # serial data is in yaw/pitch/roll format
-        if line[:3] == b'ypr' and line[-2:] == b'\r\n':
-            gyro = line.split(b'\t')[1:-2]
+        data = line[:-2].split(b'\t')
+        if len(data) == 10 and line[:3] == b'ypr' and line[-2:] == b'\r\n':
+            gyro = [0] + data[1:4] #TODO: change this workaround that uses Quaternion without w
+            if data[4] == b'aworld':
+                accel = data[5:8]
+            if data[8] == b'flex':
+                self.data.setdata(flex=float(data[9]))
         # serial data has quaternion data
-        elif line[:4] == b'quat' and line[-2:] == b'\r\n':
-            data = line.split(b'\t')
+        elif len(data) == 11 and line[:4] == b'quat' and line[-2:] == b'\r\n':
             gyro = data[1:5]
             if data[5] == b'aworld':
                 accel = data[6:9]
