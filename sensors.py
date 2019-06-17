@@ -327,14 +327,16 @@ class Sensors():
             if data[4] == b'aworld':
                 accel = data[5:8]
             if data[8] == b'flex':
-                self.data.setdata(flex=float(data[9]))
+                flex = float(data[9])
+                self.data.setdata(flex=(flex if flex != float("inf") else 0))
         # serial data has quaternion data
         elif len(data) == 11 and line[:4] == b'quat' and line[-2:] == b'\r\n':
             gyro = data[1:5]
             if data[5] == b'aworld':
                 accel = data[6:9]
             if data[9] == b'flex':
-                self.data.setdata(flex=float(data[10]))
+                flex = float(data[10])
+                self.data.setdata(flex=(flex if flex != float("inf") else 0))
 
         elif len(line) > 9 and line[0:2] == b'$\x02' and line[-2:] == b'\r\n':
             q = [0.0]*4
