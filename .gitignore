@@ -5,7 +5,6 @@ out/*
 
 ###### Arduino ######
 .vscode/arduino.json
-.vscode/c_cpp_properties.json
 
 ###### Python ######
 # Byte-compiled / optimized / DLL files

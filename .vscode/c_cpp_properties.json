@@ -1,0 +1,16 @@
+{
+    "configurations": [{
+        "name": "Arduino",
+        "defines": [],
+        "compilerPath": "",
+        "cStandard": "c11",
+        "cppStandard": "c++17",
+        "intelliSenseMode": "${default}",
+        "includePath": [
+            "${config:arduino.path}/tools/**",
+            "${config:arduino.path}/hardware/arduino/avr/**",
+            "${config:arduino.path}/libraries/**"
+        ]
+    }],
+    "version": 4
+}
