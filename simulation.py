@@ -176,7 +176,7 @@ class Simulation():
         # gl.glRotatef(-gyro_euler.x, 0, 1, 0)
         # gl.glRotatef(-gyro_euler.y, 1, 0, 0)
         # gl.glRotatef(gyro_euler.z*2, 0, 0, 1)
-        gl.glRotatef(quat.x, 0, 1, 0)
+        # gl.glRotatef(quat.x, 0, 1, 0)
         gl.glRotatef(-2*quat.y, 0, 0, 1)
         gl.glRotatef(quat.z, 1, 0, 0)
         gl.glRotatef(120, .5, .5, -.5)
