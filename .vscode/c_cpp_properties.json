@@ -1,0 +1,56 @@
+{
+    "configurations": [{
+            "name": "Linux",
+            "includePath": [
+                "/home/${env:USER}/.arduino15/packages/arduino/hardware/avr/**",
+                "/home/${env:USER}/.arduino15/packages/arduino/tools/**",
+                "/home/${env:USER}/libraries/**",
+                "${config:arduino.path}/tools/**",
+                "${config:arduino.path}/hardware/arduino/avr/**",
+                "${config:arduino.path}/libraries/**"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false,
+                "path": [
+                    "/home/${env:USER}/.arduino15/packages/arduino/hardware/avr/**",
+                    "/home/${env:USER}/.arduino15/packages/arduino/tools/**",
+                    "/home/${env:USER}/libraries/**",
+                    "${config:arduino.path}/tools/**",
+                    "${config:arduino.path}/hardware/arduino/avr/**",
+                    "${config:arduino.path}/libraries/**"
+                ]
+            },
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "/usr/sbin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        },
+        {
+            "name": "Windows",
+            "includePath": [
+                "${env:APPDATA}/.arduino15/packages/arduino/hardware/avr/**",
+                "${env:APPDATA}/.arduino15/packages/arduino/tools/**",
+                "${env:APPDATA}/libraries/**",
+                "${config:arduino.path}/tools/**",
+                "${config:arduino.path}/hardware/arduino/avr/**",
+                "${config:arduino.path}/libraries/**"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": false,
+                "path": [
+                    "${env:APPDATA}/.arduino15/packages/arduino/hardware/avr/**",
+                    "${env:APPDATA}/.arduino15/packages/arduino/tools/**",
+                    "${env:APPDATA}/libraries/**",
+                    "${config:arduino.path}/tools/**",
+                    "${config:arduino.path}/hardware/arduino/avr/**",
+                    "${config:arduino.path}/libraries/**"
+                ]
+            },
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "/usr/sbin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
