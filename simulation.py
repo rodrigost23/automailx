@@ -152,9 +152,10 @@ class Simulation():
 
         gyro_euler = quat_to_euler(quat)
         rotation = quat_to_axis_rotation(quat)
-        flex_angle = self.translate_range(
-            self.sensor_data.flex, self.flex_straight, self.flex_bent, 0.0, 90.0) \
+        flex_angle =\
+            self.translate_range(self.sensor_data.flex, self.flex_straight, self.flex_bent, 0.0, 90.0) \
             if self.sensor_data.flex != 0 else 0
+        flex_angle = min(170, max(-20, flex_angle))
 
         gl.glEnable(gl.GL_DEPTH_TEST)
         gl.glDepthFunc(gl.GL_LEQUAL)
@@ -178,7 +179,7 @@ class Simulation():
         # gl.glRotatef(-gyro_euler.y, 1, 0, 0)
         # gl.glRotatef(gyro_euler.z*2, 0, 0, 1)
         # gl.glRotatef(quat.x, 0, 1, 0)
-        gl.glRotatef(-2*quat.y, 0, 0, 1)
+        gl.glRotatef(2*quat.y, 0, 0, 1)
         gl.glRotatef(quat.z, 1, 0, 0)
         gl.glRotatef(120, .5, .5, -.5)
 
