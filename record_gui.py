@@ -77,7 +77,7 @@ def main():
         elif event.type == KEYDOWN and (event.key == K_RETURN or event.key == K_KP_ENTER):
             print("\n - ACTIVITY %d:" % (activity), end='')
 
-            save_data = list(sensor_data.data())
+            save_data = list(sensor_data.clf_data())
             with open(filename, "a", newline='') as csv_file:
                 csv_writer = csv.writer(csv_file)
                 csv_writer.writerow([activity] + save_data)

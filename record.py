@@ -61,7 +61,7 @@ def main():
         while data is None:
             data = s.read()
 
-        save_data = list(data.data())
+        save_data = list(data.clf_data())
         with open(filename, "a", newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             csv_writer.writerow([activity] + save_data)
