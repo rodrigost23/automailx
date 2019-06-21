@@ -69,8 +69,8 @@ const int FLEX_PIN = A0; // Pin connected to voltage divider output
 
 // Measure the voltage at 5V and the actual resistance of your
 // 47k resistor, and enter them below:
-const float VCC = 4.98; // Measured voltage of Ardunio 5V line
-const float R_DIV = 47500.0; // Measured resistance of 3.3k resistor
+const float VCC = 4.68; // Measured voltage of Ardunio 5V line
+const float R_DIV = 46500.0; // Measured resistance of 3.3k resistor
 
 // Upload the code, then try to adjust these values to more
 // accurately calculate bend degree.
@@ -205,12 +205,13 @@ void setup() {
     devStatus = mpu.dmpInitialize();
 
     // custom offsets
-    mpu.setXGyroOffset(247);
-    mpu.setYGyroOffset(-49);
+    mpu.setXGyroOffset(246);
+    mpu.setYGyroOffset(-31);
     mpu.setZGyroOffset(19);
-    mpu.setXAccelOffset(-3612);
-    mpu.setYAccelOffset(-282);
-    mpu.setZAccelOffset(704);
+    mpu.setXAccelOffset(-5217);
+    mpu.setYAccelOffset(-167);
+    mpu.setZAccelOffset(2466);
+
     // mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
 
     // make sure it worked (returns 0 if so)
