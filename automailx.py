@@ -39,6 +39,8 @@ def main():
     fps = 0
     ticks = pygame.time.get_ticks()
     sensor_data = SensorData()
+    if args.demo:
+        sensor_data.setdata(flex=sim.flex_straight)
     prediction = None
     try:
         predictor = Predict()
@@ -62,11 +64,11 @@ def main():
         else:
             keys = pygame.key.get_pressed()  # checking pressed keys
             if keys[pygame.K_RIGHT]:
-                sensor_data.flex = max(
-                    0.0, min(90.0, sensor_data.flex - 5))
+                sensor_data.flex = \
+                    min(sim.flex_straight, max(sim.flex_bent, sensor_data.flex + 600))
             elif keys[pygame.K_LEFT]:
-                sensor_data.flex = max(
-                    0.0, min(90.0, sensor_data.flex + 5))
+                sensor_data.flex = \
+                    min(sim.flex_straight, max(sim.flex_bent, sensor_data.flex - 600))
             elif args.demo:
                 if event.type == KEYDOWN and event.key == K_UP:
                     sim.nextPose()
