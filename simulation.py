@@ -86,7 +86,7 @@ class Simulation():
         """
         self.resize(width, height)
         gl.glShadeModel(gl.GL_SMOOTH)
-        gl.glClearColor(0.0, 0.0, 0.0, 1.0)
+        gl.glClearColor(.8, .8, .8, 1.0)
         gl.glClearDepth(1.0)
 
         self.quad = glu.gluNewQuadric()
@@ -126,7 +126,7 @@ class Simulation():
     def drawText(self, position, textString):
         font = pygame.font.SysFont("Courier", 18, True)
         text_surface = font.render(
-            textString, True, (255, 255, 255, 255), (0, 0, 0, 255))
+            textString, True, (20, 20, 20, 255), (204, 204, 204, 230))
         text_data = pygame.image.tostring(text_surface, "RGBA", True)
         gl.glRasterPos3d(*position)
         gl.glDrawPixels(text_surface.get_width(), text_surface.get_height(),
@@ -135,6 +135,10 @@ class Simulation():
     def draw(self):
         """Draws one frame in the OpenGL window
         """
+        blue = (.27, .388, .678)
+        dark_grey = (.235, .243, .266)
+        grey = (.309, .309, .309)
+        light_grey = (.447, .435, .449)
         sensor_data = self.sensor_data
         print("\r%s" % sensor_data, end='')
         #FIXME: Workaround to avoid using quaternions
@@ -183,10 +187,10 @@ class Simulation():
         gl.glRotatef(quat.z, 1, 0, 0)
         gl.glRotatef(120, .5, .5, -.5)
 
-        gl.glColor3f(1, 0, 1)
-        glu.gluDisk(self.quad, 0, 0.2, 10, 1)
+        # gl.glColor3f(1, 0, 1)
+        # glu.gluDisk(self.quad, 0, 0.2, 10, 1)
 
-        gl.glColor3f(0, 0, 1)
+        gl.glColor3f(*blue)
         glu.gluCylinder(self.quad, 0.2, 0.15, 2, 10, 1)
 
         gl.glTranslatef(0, 0, 2)
@@ -195,16 +199,16 @@ class Simulation():
         # Pitch, rotate around x-axis
         gl.glRotatef(flex_angle, 1.0, 0.0, 0.0)
 
-        gl.glColor3f(0, 1, 0)
-        glu.gluDisk(self.quad, 0, 0.15, 10, 1)
+        gl.glColor3f(*dark_grey)
+        # glu.gluDisk(self.quad, 0, 0.15, 10, 1)
         glu.gluSphere(self.quad, 0.2, 6, 6)
 
-        gl.glColor3f(0.2, 0.4, 1)
+        gl.glColor3f(*blue)
         glu.gluCylinder(self.quad, 0.15, 0.125, 1.8, 9, 1)
 
         gl.glTranslatef(0, 0, 1.8)
-        gl.glColor3f(0, 1, 0)
-        glu.gluDisk(self.quad, 0, 0.125, 9, 1)
+        # gl.glColor3f(0, 1, 0)
+        # glu.gluDisk(self.quad, 0, 0.125, 9, 1)
 
         # First part of foot
 
@@ -213,43 +217,43 @@ class Simulation():
         elif self.pose == 1:
             gl.glRotatef(60.0, 1.0, 0.0, 0.0)
 
-        gl.glColor3f(0, 1, 0)
+        gl.glColor3f(*dark_grey)
         glu.gluDisk(self.quad, 0, 0.15, 10, 1)
         glu.gluSphere(self.quad, 0.2, 6, 6)
 
         gl.glBegin(gl.GL_QUADS)
 
-        gl.glColor3f(1.0, 1.0, 0.0)  # Yellow
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, -0.1, 0.0)
         gl.glVertex3f(0.2, -0.1, 0.0)
         gl.glVertex3f(0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, -0.1, 0.3)
 
-        gl.glColor3f(1.0, 0.5, 0.0)  # Orange
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(-0.2, -0.1, 0.0)
 
-        gl.glColor3f(1.0, 0.5, 0.0)  # Orange
+        gl.glColor3f(*light_grey)
         gl.glVertex3f(0.2, -0.1, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, -0.1, 0.0)
 
-        gl.glColor3f(1.0, 0.0, 1.0)  # Magenta
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, -0.1, 0.0)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, -0.1, 0.0)
 
-        gl.glColor3f(0.0, 0.0, 1.0)  # Blue
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, -0.1, 0.3)
 
-        gl.glColor3f(1.0, 0.0, 0.0)  # Red
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, 0.8, 0.1)
@@ -265,42 +269,42 @@ class Simulation():
         elif self.pose == 1:
             gl.glRotatef(-60.0, 1.0, 0.0, 0.0)
 
-        gl.glColor3f(0, 1, 0)
+        gl.glColor3f(*dark_grey)
         glu.gluSphere(self.quad, 0.1, 6, 6)
 
         gl.glBegin(gl.GL_QUADS)
 
-        gl.glColor3f(1.0, 1.0, 0.0)  # Yellow
+        gl.glColor3f(*light_grey)
         gl.glVertex3f(-0.2, 0.02, 0.0)
         gl.glVertex3f(0.2, 0.02, 0.0)
         gl.glVertex3f(0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.02, 0.2)
 
-        gl.glColor3f(1.0, 0.5, 0.0)  # Orange
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(-0.2, 0.02, 0.0)
 
-        gl.glColor3f(1.0, 0.5, 0.0)  # Orange
+        gl.glColor3f(*grey)
         gl.glVertex3f(0.2, 0.02, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.02, 0.0)
 
-        gl.glColor3f(1.0, 0.0, 1.0)  # Magenta
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, 0.02, 0.0)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.02, 0.0)
 
-        gl.glColor3f(0.0, 0.0, 1.0)  # Blue
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.02, 0.2)
 
-        gl.glColor3f(1.0, 0.0, 0.0)  # Red
+        gl.glColor3f(*grey)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.4, 0.1)
