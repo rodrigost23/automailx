@@ -85,9 +85,6 @@ class Simulation():
             height {int} -- Window height in pixels
         """
         self.resize(width, height)
-        gl.glShadeModel(gl.GL_SMOOTH)
-        gl.glClearColor(.8, .8, .8, 1.0)
-        gl.glClearDepth(1.0)
 
         self.quad = glu.gluNewQuadric()
         glu.gluQuadricDrawStyle(self.quad, gl.GL_LINE)
@@ -161,10 +158,22 @@ class Simulation():
             if self.sensor_data.flex != 0 else 0
         flex_angle = min(170, max(-20, flex_angle))
 
+        gl.glShadeModel(gl.GL_SMOOTH)
+        gl.glClearColor(.8, .8, .8, 1.0)
+        gl.glClearDepth(1.0)
         gl.glEnable(gl.GL_DEPTH_TEST)
+        gl.glEnable(gl.GL_LIGHTING)
         gl.glDepthFunc(gl.GL_LEQUAL)
         gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST)
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT |
+                   gl.GL_DEPTH_BUFFER_BIT | gl.GL_STENCIL_BUFFER_BIT)
+        gl.glEnable(gl.GL_LIGHT0)
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, (3, -1, 3))
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, (.5, .5, .5))
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, (.5, .5, .5))
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_SPECULAR, (0, 0, 0))
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_SPOT_DIRECTION, (-1, 0, -1))
+        gl.glLightf(gl.GL_LIGHT0, gl.GL_SPOT_CUTOFF, 180)
 
         gl.glLoadIdentity()
         gl.glTranslatef(0, 0.0, -7.0)
@@ -177,7 +186,10 @@ class Simulation():
 
         self.drawText((-2, 1.9, 2), osd_line)
 
+        gl.glPushMatrix()
+
         gl.glTranslatef(0, 2.0, 0.0)
+        gl.glNormal3f(0.0, -1.0, 0.0)
         #TODO: Change back to quaternions
         # gl.glRotatef(-gyro_euler.x, 0, 1, 0)
         # gl.glRotatef(-gyro_euler.y, 1, 0, 0)
@@ -190,7 +202,7 @@ class Simulation():
         # gl.glColor3f(1, 0, 1)
         # glu.gluDisk(self.quad, 0, 0.2, 10, 1)
 
-        gl.glColor3f(*blue)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE, blue)
         glu.gluCylinder(self.quad, 0.2, 0.15, 2, 10, 1)
 
         gl.glTranslatef(0, 0, 2)
@@ -199,11 +211,11 @@ class Simulation():
         # Pitch, rotate around x-axis
         gl.glRotatef(flex_angle, 1.0, 0.0, 0.0)
 
-        gl.glColor3f(*dark_grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,dark_grey)
         # glu.gluDisk(self.quad, 0, 0.15, 10, 1)
         glu.gluSphere(self.quad, 0.2, 6, 6)
 
-        gl.glColor3f(*blue)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,blue)
         glu.gluCylinder(self.quad, 0.15, 0.125, 1.8, 9, 1)
 
         gl.glTranslatef(0, 0, 1.8)
@@ -217,43 +229,43 @@ class Simulation():
         elif self.pose == 1:
             gl.glRotatef(60.0, 1.0, 0.0, 0.0)
 
-        gl.glColor3f(*dark_grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,dark_grey)
         glu.gluDisk(self.quad, 0, 0.15, 10, 1)
         glu.gluSphere(self.quad, 0.2, 6, 6)
 
         gl.glBegin(gl.GL_QUADS)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, -0.1, 0.0)
         gl.glVertex3f(0.2, -0.1, 0.0)
         gl.glVertex3f(0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, -0.1, 0.3)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(-0.2, -0.1, 0.0)
 
-        gl.glColor3f(*light_grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(0.2, -0.1, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, -0.1, 0.0)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, -0.1, 0.0)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, -0.1, 0.0)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, -0.1, 0.3)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, 0.8, 0.1)
@@ -269,45 +281,47 @@ class Simulation():
         elif self.pose == 1:
             gl.glRotatef(-60.0, 1.0, 0.0, 0.0)
 
-        gl.glColor3f(*dark_grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,dark_grey)
         glu.gluSphere(self.quad, 0.1, 6, 6)
 
         gl.glBegin(gl.GL_QUADS)
 
-        gl.glColor3f(*light_grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, 0.02, 0.0)
         gl.glVertex3f(0.2, 0.02, 0.0)
         gl.glVertex3f(0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.02, 0.2)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(-0.2, 0.02, 0.0)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(0.2, 0.02, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.02, 0.0)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, 0.02, 0.0)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.02, 0.0)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.02, 0.2)
 
-        gl.glColor3f(*grey)
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.4, 0.2)
 
         gl.glEnd()
+        gl.glPopMatrix()
+
