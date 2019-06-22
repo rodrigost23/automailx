@@ -158,22 +158,23 @@ class Simulation():
             if self.sensor_data.flex != 0 else 0
         flex_angle = min(170, max(-20, flex_angle))
 
-        gl.glShadeModel(gl.GL_SMOOTH)
         gl.glClearColor(.8, .8, .8, 1.0)
         gl.glClearDepth(1.0)
         gl.glEnable(gl.GL_DEPTH_TEST)
         gl.glEnable(gl.GL_LIGHTING)
+        gl.glShadeModel(gl.GL_SMOOTH)
+        gl.glDisable(gl.GL_COLOR_MATERIAL)
         gl.glDepthFunc(gl.GL_LEQUAL)
         gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT |
                    gl.GL_DEPTH_BUFFER_BIT | gl.GL_STENCIL_BUFFER_BIT)
         gl.glEnable(gl.GL_LIGHT0)
-        gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, (3, -1, 3))
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, (1, 2, 3))
         gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, (.5, .5, .5))
-        gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, (.5, .5, .5))
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, (.6, .6, .6))
         gl.glLightfv(gl.GL_LIGHT0, gl.GL_SPECULAR, (0, 0, 0))
-        gl.glLightfv(gl.GL_LIGHT0, gl.GL_SPOT_DIRECTION, (-1, 0, -1))
-        gl.glLightf(gl.GL_LIGHT0, gl.GL_SPOT_CUTOFF, 180)
+        # gl.glLightfv(gl.GL_LIGHT0, gl.GL_SPOT_DIRECTION, (-2, -3, -3))
+        gl.glLightf(gl.GL_LIGHT0, gl.GL_SPOT_CUTOFF, 180) # omnidirectional
 
         gl.glLoadIdentity()
         gl.glTranslatef(0, 0.0, -7.0)
@@ -199,9 +200,6 @@ class Simulation():
         gl.glRotatef(quat.z, 1, 0, 0)
         gl.glRotatef(120, .5, .5, -.5)
 
-        # gl.glColor3f(1, 0, 1)
-        # glu.gluDisk(self.quad, 0, 0.2, 10, 1)
-
         gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE, blue)
         glu.gluCylinder(self.quad, 0.2, 0.15, 2, 10, 1)
 
@@ -212,17 +210,16 @@ class Simulation():
         gl.glRotatef(flex_angle, 1.0, 0.0, 0.0)
 
         gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,dark_grey)
-        # glu.gluDisk(self.quad, 0, 0.15, 10, 1)
         glu.gluSphere(self.quad, 0.2, 6, 6)
 
         gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,blue)
         glu.gluCylinder(self.quad, 0.15, 0.125, 1.8, 9, 1)
 
         gl.glTranslatef(0, 0, 1.8)
-        # gl.glColor3f(0, 1, 0)
-        # glu.gluDisk(self.quad, 0, 0.125, 9, 1)
 
+        # -------------------
         # First part of foot
+        # -------------------
 
         if self.pose == 0:
             pass
@@ -230,42 +227,48 @@ class Simulation():
             gl.glRotatef(60.0, 1.0, 0.0, 0.0)
 
         gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,dark_grey)
-        glu.gluDisk(self.quad, 0, 0.15, 10, 1)
         glu.gluSphere(self.quad, 0.2, 6, 6)
 
         gl.glBegin(gl.GL_QUADS)
-
+        
         gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - back
+        gl.glNormal3f(0, -1, 0)
         gl.glVertex3f(-0.2, -0.1, 0.0)
         gl.glVertex3f(0.2, -0.1, 0.0)
         gl.glVertex3f(0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, -0.1, 0.3)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - right
+        gl.glNormal3f(-1, 0, 0)
         gl.glVertex3f(-0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(-0.2, -0.1, 0.0)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - left
+        gl.glNormal3f(1, 0, 0)
         gl.glVertex3f(0.2, -0.1, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, -0.1, 0.0)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - top
+        gl.glNormal3f(0, 0, -1)
         gl.glVertex3f(-0.2, -0.1, 0.0)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, -0.1, 0.0)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - front
+        gl.glNormal3f(0, 1, 0)
         gl.glVertex3f(-0.2, -0.1, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, 0.8, 0.3)
         gl.glVertex3f(0.2, -0.1, 0.3)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - bottom
+        gl.glNormal3f(0, 0, 1)
         gl.glVertex3f(-0.2, 0.8, 0.3)
         gl.glVertex3f(-0.2, 0.8, 0.1)
         gl.glVertex3f(0.2, 0.8, 0.1)
@@ -274,7 +277,9 @@ class Simulation():
         gl.glEnd()
         gl.glTranslatef(0, 0.8, 0.1)
 
+        # -------------------
         # Second part of foot
+        # -------------------
 
         if self.pose == 0:
             pass
@@ -284,39 +289,47 @@ class Simulation():
         gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,dark_grey)
         glu.gluSphere(self.quad, 0.1, 6, 6)
 
+        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        
         gl.glBegin(gl.GL_QUADS)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - back
+        gl.glNormal3f(0, -1, 0)
         gl.glVertex3f(-0.2, 0.02, 0.0)
         gl.glVertex3f(0.2, 0.02, 0.0)
         gl.glVertex3f(0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.02, 0.2)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - right
+        gl.glNormal3f(-1, 0, 0)
         gl.glVertex3f(-0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(-0.2, 0.02, 0.0)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - left
+        gl.glNormal3f(1, 0, 0)
         gl.glVertex3f(0.2, 0.02, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.02, 0.0)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - top
+        gl.glNormal3f(0, 0, -1)
         gl.glVertex3f(-0.2, 0.02, 0.0)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.02, 0.0)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - front
+        gl.glNormal3f(0, 1, 0)
         gl.glVertex3f(-0.2, 0.02, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.4, 0.2)
         gl.glVertex3f(0.2, 0.02, 0.2)
 
-        gl.glMaterialfv(gl.GL_FRONT_AND_BACK, gl.GL_AMBIENT_AND_DIFFUSE,grey)
+        # foot - bottom
+        gl.glNormal3f(0, 0, 1)
         gl.glVertex3f(-0.2, 0.4, 0.2)
         gl.glVertex3f(-0.2, 0.4, 0.1)
         gl.glVertex3f(0.2, 0.4, 0.1)
