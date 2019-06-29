@@ -53,8 +53,8 @@ class Simulation():
     offset = SensorData()
     pose = 0
     __num_poses = 2
-    flex_bent = 29000.0
-    flex_straight = 64000.0
+    flex_bent = 54000.0
+    flex_straight = 123000.0
 
     def translate_range(self, value, leftMin, leftMax, rightMin, rightMax):
         """Translates one range to another"""
