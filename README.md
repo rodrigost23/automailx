@@ -25,3 +25,11 @@ Run `pip install -r requirements.txt` to get the dependencies.
     --net [port]     Listen to sensor data over UDP
     --serial [port]  Listen to sensor data over serial (default)
     --demo           Only show 3D model with no sensor data
+
+## Serial data format
+
+The current configuration uses baud rate of `115200` and outputs the following format in the Arduino:
+
+`ypr	x	y	z	aworld	x	y	z	flex	x`
+
+Yaw/Pitch/Roll for the whole orientation, then acceleration relative to world, then the resistance of the flex sensor, each separated by a tab character.
